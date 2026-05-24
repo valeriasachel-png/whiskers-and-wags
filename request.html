@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Request pet and home sitting from Whiskers & Wags.">
+    <title>Request Pet Sitting | Whiskers &amp; Wags</title>
+    <link rel="canonical" href="https://whiskersandwagsms.com/request.html">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/shared.js" defer></script>
+    <script src="/request.js" defer></script>
+  </head>
+  <body>
+    <div data-site-header></div>
+    <main>
+      <section class="page-hero">
+        <div class="container">
+          <div class="eyebrow">Book With Care</div>
+          <h1>Request Pet Sitting</h1>
+          <p>Tell us about your pets, home, and schedule. We will follow up to confirm availability and all care details.</p>
+        </div>
+      </section>
+      <div class="container form-layout">
+        <aside class="panel sticky-panel" aria-label="Requested date selection">
+          <h2>Select your dates</h2>
+          <p class="muted">Choose one or more days when you need care.</p>
+          <div class="calendar" id="calendar">
+            <div class="calendar-head">
+              <button class="calendar-control" id="previous-month" type="button" aria-label="Previous month">&lsaquo;</button>
+              <h3 id="calendar-month" aria-live="polite"></h3>
+              <button class="calendar-control" id="next-month" type="button" aria-label="Next month">&rsaquo;</button>
+            </div>
+            <div class="calendar-week" aria-hidden="true">
+              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+            </div>
+            <div class="calendar-days" id="calendar-days"></div>
+          </div>
+          <div class="selected-summary" id="date-summary" aria-live="polite">
+            <strong>Requested dates</strong>
+            No dates selected yet.
+          </div>
+          <div class="notice">Dates are requests until availability is confirmed.</div>
+        </aside>
+
+        <form class="panel request-form" id="request-form">
+          <h2>Pet & Home Details</h2>
+          <div class="field-trap" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="fullName">Full Name <span class="required" aria-hidden="true">*</span></label>
+              <input id="fullName" name="fullName" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="phone">Phone Number <span class="required" aria-hidden="true">*</span></label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+            </div>
+            <div class="field full">
+              <label for="address">Address <span class="required" aria-hidden="true">*</span></label>
+              <input id="address" name="address" autocomplete="street-address" required>
+            </div>
+            <div class="field">
+              <label for="email">Email Address <span class="required" aria-hidden="true">*</span></label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="serviceType">Type of Service <span class="required" aria-hidden="true">*</span></label>
+              <select id="serviceType" name="serviceType" required>
+                <option value="">Select service</option>
+                <option>Pet Sitting</option>
+                <option>Home Sitting</option>
+                <option>Both</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="requestedDates">Requested Dates <span class="required" aria-hidden="true">*</span></label>
+              <input id="requestedDates" name="requestedDates" readonly required placeholder="Choose dates using the calendar">
+              <span class="help">Select one or multiple dates in the calendar.</span>
+            </div>
+            <div class="field">
+              <label for="petNames">Pet Names <span class="required" aria-hidden="true">*</span></label>
+              <input id="petNames" name="petNames" required>
+            </div>
+            <div class="field">
+              <label for="petTypes">Type of Pets <span class="required" aria-hidden="true">*</span></label>
+              <input id="petTypes" name="petTypes" placeholder="Dog, cat, rabbit..." required>
+            </div>
+            <div class="field">
+              <label for="petCount">Number of Pets <span class="required" aria-hidden="true">*</span></label>
+              <input id="petCount" name="petCount" type="number" min="1" max="30" required>
+            </div>
+            <div class="field">
+              <label for="emergencyContact">Emergency Contact <span class="required" aria-hidden="true">*</span></label>
+              <input id="emergencyContact" name="emergencyContact" placeholder="Name and phone number" required>
+            </div>
+            <div class="field full">
+              <label for="careInstructions">Pet Care Instructions <span class="required" aria-hidden="true">*</span></label>
+              <textarea id="careInstructions" name="careInstructions" required placeholder="Routines, personality, entry instructions, favorite toys..."></textarea>
+            </div>
+            <div class="field">
+              <label for="feedingSchedule">Feeding Schedule</label>
+              <textarea id="feedingSchedule" name="feedingSchedule"></textarea>
+            </div>
+            <div class="field">
+              <label for="medicalNeeds">Medication or Special Needs</label>
+              <textarea id="medicalNeeds" name="medicalNeeds"></textarea>
+            </div>
+            <div class="field full">
+              <label for="additionalNotes">Additional Notes</label>
+              <textarea id="additionalNotes" name="additionalNotes" placeholder="Mail, plants, home check-in needs, or anything else we should know."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="button" id="submit-request" type="submit">Submit Request</button>
+            <span class="help">Required fields are marked with <span class="required">*</span>.</span>
+          </div>
+          <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </main>
+    <div data-site-footer></div>
+  </body>
+</html>
