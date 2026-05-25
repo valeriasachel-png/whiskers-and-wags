@@ -36,6 +36,19 @@ body {
   line-height: 1.6;
 }
 
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 560ms cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 600ms cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -341,6 +354,43 @@ h3 {
   width: 100%;
 }
 
+.home-page .hero-photo-desktop .hero-photo {
+  animation: hero-breathe 8s ease-in-out infinite;
+}
+
+.home-page .hero-photo-wrap::after {
+  background: var(--white);
+  border-radius: 999px;
+  box-shadow: 0 13px 30px rgba(54, 50, 36, 0.12);
+  color: var(--sage-dark);
+  content: 'Loving care at home';
+  font-size: 0.8rem;
+  font-weight: 700;
+  left: 32px;
+  letter-spacing: 0.02em;
+  padding: 11px 17px 11px 35px;
+  position: absolute;
+  bottom: 30px;
+}
+
+.home-page .hero-photo-wrap::after {
+  background-image: radial-gradient(circle at 19px 50%, var(--terracotta) 0 4px, transparent 5px);
+}
+
+.hero-photo-mobile::after {
+  display: none;
+}
+
+@keyframes hero-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.008);
+  }
+}
+
 .hero-photo-mobile {
   display: none;
 }
@@ -445,6 +495,14 @@ h3 {
 .service-card:hover {
   box-shadow: var(--shadow);
   transform: translateY(-4px);
+}
+
+.home-page .service-card .icon {
+  transition: transform 180ms ease;
+}
+
+.home-page .service-card:hover .icon {
+  transform: rotate(-6deg) scale(1.08);
 }
 
 .service-card:hover::before {
@@ -593,6 +651,24 @@ h3 {
   padding: 42px 48px;
 }
 
+.home-page .cta-banner,
+.gallery-page .cta-banner {
+  overflow: hidden;
+  position: relative;
+}
+
+.home-page .cta-banner::after,
+.gallery-page .cta-banner::after {
+  border: 1px solid rgba(242, 197, 166, 0.24);
+  border-radius: 50%;
+  content: '';
+  height: 180px;
+  position: absolute;
+  right: -62px;
+  top: -92px;
+  width: 180px;
+}
+
 .cta-banner h2,
 .cta-banner p {
   color: var(--white);
@@ -606,6 +682,25 @@ h3 {
 .page-hero {
   padding: 58px 0 50px;
   text-align: center;
+}
+
+.gallery-page .page-hero {
+  background:
+    linear-gradient(rgba(255, 250, 243, 0.76), rgba(255, 250, 243, 0.88)),
+    url('/assets/brand-paper-v1.jpg') center / cover no-repeat;
+  border-bottom: 1px solid rgba(232, 218, 203, 0.6);
+  position: relative;
+}
+
+.gallery-page .page-hero::after {
+  color: rgba(202, 120, 88, 0.18);
+  content: '\2665  \2022  \2665';
+  font-size: 1.2rem;
+  letter-spacing: 0.55rem;
+  position: absolute;
+  bottom: 17px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .page-hero p {
@@ -870,6 +965,7 @@ textarea {
   content-visibility: auto;
   overflow: hidden;
   padding: 12px 12px 22px;
+  transition: box-shadow 220ms ease, transform 220ms ease;
 }
 
 .pet-photo {
@@ -879,6 +975,16 @@ textarea {
   margin-bottom: 19px;
   object-fit: cover;
   width: 100%;
+  transition: transform 420ms ease;
+}
+
+.gallery-page .pet-card:hover {
+  box-shadow: var(--shadow-deep);
+  transform: translateY(-5px) rotate(-0.2deg);
+}
+
+.gallery-page .pet-card:hover .pet-photo {
+  transform: scale(1.035);
 }
 
 .pet-card-featured {
@@ -931,6 +1037,16 @@ textarea {
   margin: 0 auto;
   max-width: 690px;
   text-align: center;
+}
+
+.gallery-page section[aria-labelledby='reviews-title'] {
+  background:
+    linear-gradient(rgba(255, 253, 249, 0.86), rgba(255, 253, 249, 0.96)),
+    url('/assets/brand-paper-v1.jpg') center / cover no-repeat;
+}
+
+.gallery-page .testimonial-placeholder {
+  box-shadow: 0 13px 36px rgba(72, 55, 41, 0.06);
 }
 
 .disclosure {
@@ -1383,6 +1499,10 @@ textarea {
     aspect-ratio: 900 / 1124;
   }
 
+  .home-page .hero-photo-mobile .hero-photo {
+    animation: hero-breathe 8s ease-in-out infinite;
+  }
+
   .hero-photo-wrap {
     padding: 7px;
   }
@@ -1674,5 +1794,21 @@ textarea {
 @media (max-width: 420px) {
   .product-image {
     height: 195px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 }

@@ -111,3 +111,54 @@ document.addEventListener('keydown', (event) => {
     menuButton.focus();
   }
 });
+
+// MOTION EDIT: These selectors add gentle movement only on the home and gallery pages.
+const revealSelectors = {
+  '/': [
+    '.hero-copy > *',
+    '.hero-photo-desktop',
+    '.hero-photo-mobile',
+    '.promise',
+    '.section-heading',
+    '.service-card',
+    '.story-copy',
+    '.visit-step',
+    '.trust-card',
+    '.cta-banner',
+  ],
+  '/gallery.html': [
+    '.page-hero .container > *',
+    '.section-heading',
+    '.pet-card',
+    '.testimonial',
+    '.cta-banner',
+  ],
+};
+
+const revealTargets = revealSelectors[currentPath()]?.flatMap((selector) => Array.from(document.querySelectorAll(selector))) ?? [];
+
+revealTargets.forEach((element, index) => {
+  element.classList.add('reveal');
+  element.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 55}ms`);
+});
+
+if (revealTargets.length) {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    revealTargets.forEach((element) => element.classList.add('in-view'));
+  } else {
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+    );
+
+    revealTargets.forEach((element) => revealObserver.observe(element));
+  }
+}
