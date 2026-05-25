@@ -5,7 +5,7 @@ A responsive multi-page website for a pet sitting and home sitting business. It 
 - Welcoming home page with services and calls to action
 - Accessible request form with multi-date calendar selection
 - Photo gallery with testimonials ready for approved client quotes
-- Affiliate product recommendations with active Amazon tracking disclosure
+- Exact Amazon product recommendations with active Associates tracking disclosure
 - Server-side form delivery through a Cloudflare Pages Function and Resend
 - Basic bot-trap protection for request submissions
 
@@ -83,12 +83,12 @@ Do not announce or submit the website to Amazon Associates until these are compl
 
 ## Amazon Associates Setup
 
-The Pet Care Picks page contains curated named product options. Its Amazon buttons use the public Associates tracking ID configured in `picks.js` (`whiskersan07f-20`) so tagged search referrals can be attributed to this store.
+The Pet Care Picks page includes only products matched to a specific Amazon listing. Its Amazon buttons use the public Associates tracking ID configured in `picks.js` (`whiskersan07f-20`) so direct product referrals can be attributed to this store.
 
 1. Keep the tracking ID in `amazonTrackingId` updated if the Amazon Associates store ID ever changes.
-2. The current links open Amazon search results for each named recommendation and append the tracking ID automatically.
-3. To send visitors to one exact size, color, or item listing later, replace a generated destination with a Special Link produced in Amazon SiteStripe or Product Linking.
-4. For product photos, use only images supplied through Amazon's approved linking/API tools. The current stylized product previews avoid misrepresenting an actual listing.
+2. Add only products whose exact Amazon listing, ASIN, description details, and Amazon-hosted listing image have been verified.
+3. The site appends the tracking ID to each exact product URL. A SiteStripe Special Link can be substituted for any item later.
+4. Product photos displayed on the page must come from the matched Amazon listing or Amazon's approved linking/API tools.
 
 The page intentionally does not show prices or claim current availability. Amazon's current policies restrict displaying those details unless Amazon serves them or they are obtained through an approved API.
 
