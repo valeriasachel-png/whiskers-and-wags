@@ -198,8 +198,8 @@ h3 {
 .hero-grid {
   align-items: center;
   display: grid;
-  gap: 48px;
-  grid-template-columns: 0.9fr 1fr;
+  gap: 42px;
+  grid-template-columns: 0.82fr 1.18fr;
 }
 
 .eyebrow {
@@ -310,7 +310,6 @@ h3 {
 }
 
 .hero-photo-wrap {
-  min-height: 530px;
   padding: 10px;
   position: relative;
 }
@@ -324,10 +323,11 @@ h3 {
 }
 
 .hero-photo {
+  aspect-ratio: 1400 / 768;
   border-radius: 36px;
-  height: 535px;
+  height: auto;
   object-fit: cover;
-  object-position: center 38%;
+  object-position: center;
   width: 100%;
 }
 
@@ -1184,7 +1184,7 @@ textarea {
   }
 
   .hero-photo {
-    height: min(500px, 68vw);
+    height: auto;
   }
 
   .promise {
@@ -1251,7 +1251,7 @@ textarea {
 
   .hero-photo {
     border-radius: 25px;
-    height: min(400px, 98vw);
+    height: auto;
   }
 
   .hero-photo-wrap {
