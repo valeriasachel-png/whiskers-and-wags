@@ -10,21 +10,21 @@ const business = {
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/request.html', label: 'Request Pet Sitting' },
-  { href: '/gallery.html', label: 'Gallery & Testimonials' },
-  { href: '/picks.html', label: 'Pet Care Picks' },
+  { href: '/request', label: 'Request Pet Sitting' },
+  { href: '/gallery', label: 'Gallery & Testimonials' },
+  { href: '/picks', label: 'Pet Care Picks' },
 ];
 
 function currentPath() {
   const path = window.location.pathname;
-  const cleanPageAliases = {
-    '/gallery': '/gallery.html',
-    '/picks': '/picks.html',
-    '/privacy': '/privacy.html',
-    '/request': '/request.html',
+  const filePageAliases = {
+    '/gallery.html': '/gallery',
+    '/picks.html': '/picks',
+    '/privacy.html': '/privacy',
+    '/request.html': '/request',
   };
   if (path === '/index.html') return '/';
-  return cleanPageAliases[path] ?? path;
+  return filePageAliases[path] ?? path;
 }
 
 function renderHeader() {
@@ -66,13 +66,13 @@ function renderFooter() {
         <div class="footer-links">
           <strong>Visit</strong>
           ${navLinks.map(({ href, label }) => `<a href="${href}">${label}</a>`).join('')}
-          <a href="/privacy.html">Privacy Policy</a>
+          <a href="/privacy">Privacy Policy</a>
         </div>
         <div class="footer-contact">
           <strong>Connect</strong>
           ${phones}
           ${email}
-          <a class="button button-small" href="/request.html">Request Care</a>
+          <a class="button button-small" href="/request">Request Care</a>
         </div>
       </div>
       <div class="footer-bottom">&copy; ${new Date().getFullYear()} ${business.name}. ${business.slogan}</div>
@@ -84,7 +84,7 @@ document.querySelector('[data-site-footer]').innerHTML = renderFooter();
 document.body.insertAdjacentHTML(
   'beforeend',
   `<div class="mobile-actions" aria-label="Quick actions">
-    <a href="/request.html">Request Care</a>
+    <a href="/request">Request Care</a>
     <a href="tel:${business.phones[0].replace(/\D/g, '')}">Call Now</a>
   </div>`,
 );
@@ -133,7 +133,7 @@ const revealSelectors = {
     '.trust-card',
     '.cta-banner',
   ],
-  '/gallery.html': [
+  '/gallery': [
     '.page-hero .container > *',
     '.section-heading',
     '.pet-card',

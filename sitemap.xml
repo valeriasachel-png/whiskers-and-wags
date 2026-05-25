@@ -2,17 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://whiskersandwagsms.com/</loc>
+    <lastmod>2026-05-25</lastmod>
   </url>
   <url>
-    <loc>https://whiskersandwagsms.com/request.html</loc>
+    <loc>https://whiskersandwagsms.com/request</loc>
+    <lastmod>2026-05-25</lastmod>
   </url>
   <url>
-    <loc>https://whiskersandwagsms.com/gallery.html</loc>
+    <loc>https://whiskersandwagsms.com/gallery</loc>
+    <lastmod>2026-05-25</lastmod>
   </url>
   <url>
-    <loc>https://whiskersandwagsms.com/picks.html</loc>
+    <loc>https://whiskersandwagsms.com/picks</loc>
+    <lastmod>2026-05-25</lastmod>
   </url>
   <url>
-    <loc>https://whiskersandwagsms.com/privacy.html</loc>
+    <loc>https://whiskersandwagsms.com/privacy</loc>
+    <lastmod>2026-05-25</lastmod>
   </url>
 </urlset>

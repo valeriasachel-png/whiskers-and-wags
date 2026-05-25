@@ -190,7 +190,14 @@ async function submitRequest(request, response) {
 }
 
 async function serveStatic(request, response, url) {
-  const requested = url.pathname === '/' ? '/index.html' : decodeURIComponent(url.pathname);
+  const cleanRouteFiles = {
+    '/request': '/request.html',
+    '/gallery': '/gallery.html',
+    '/picks': '/picks.html',
+    '/privacy': '/privacy.html',
+  };
+  const requested =
+    url.pathname === '/' ? '/index.html' : cleanRouteFiles[url.pathname] || decodeURIComponent(url.pathname);
   const filename = path.resolve(root, `.${requested}`);
   const permitted = filename.startsWith(`${root}${path.sep}`) && filename !== envFile;
   const extension = path.extname(filename).toLowerCase();
