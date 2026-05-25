@@ -6,7 +6,7 @@ const amazonTrackingId = 'whiskersan07f-20';
 const categories = [
   {
     name: 'Pet Food & Treat Storage',
-    label: 'Food storage',
+    label: 'Storage',
     intro: 'Verified products from exact Amazon listings.',
     products: [
       {
@@ -44,7 +44,7 @@ const categories = [
   },
   {
     name: 'Pet Beds & Blankets',
-    label: 'Cozy beds',
+    label: 'Comfort',
     intro: 'Cozy comfort pieces for naps, furniture protection, and quiet time.',
     products: [
       {
@@ -113,7 +113,7 @@ const categories = [
   },
   {
     name: 'Cleaning & Odor Control',
-    label: 'Clean home',
+    label: 'Cleaning',
     intro: 'Practical choices for fur, accidents, and fresh-feeling spaces.',
     products: [
       {
@@ -136,7 +136,7 @@ const categories = [
   },
   {
     name: 'Home Safety Items',
-    label: 'Home safety',
+    label: 'Safety',
     intro: 'Helpful home-check tools for comfortable stays and peace of mind.',
     products: [
       {

@@ -1547,15 +1547,18 @@ textarea {
 
   .category-filters {
     display: grid;
-    gap: 8px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     margin: 0 0 16px;
   }
 
   .category-filter {
+    font-size: 0.73rem;
+    line-height: 1.2;
+    min-height: 44px;
     text-align: center;
     width: 100%;
-    padding: 10px 15px;
+    padding: 8px 4px;
   }
 
   .category {
