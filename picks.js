@@ -6,6 +6,7 @@ const amazonTrackingId = 'whiskersan07f-20';
 const categories = [
   {
     name: 'Pet Food & Treat Storage',
+    label: 'Food storage',
     intro: 'Verified products from exact Amazon listings.',
     products: [
       {
@@ -28,6 +29,7 @@ const categories = [
   },
   {
     name: 'Leashes, Collars & Harnesses',
+    label: 'Walk gear',
     intro: 'Everyday walking gear chosen for secure, comfortable outings.',
     products: [
       {
@@ -42,6 +44,7 @@ const categories = [
   },
   {
     name: 'Pet Beds & Blankets',
+    label: 'Cozy beds',
     intro: 'Cozy comfort pieces for naps, furniture protection, and quiet time.',
     products: [
       {
@@ -64,6 +67,7 @@ const categories = [
   },
   {
     name: 'Grooming Supplies',
+    label: 'Grooming',
     intro: 'Simple grooming essentials for cleanups between care visits.',
     products: [
       {
@@ -86,6 +90,7 @@ const categories = [
   },
   {
     name: 'Toys & Enrichment',
+    label: 'Playtime',
     intro: 'Engaging favorites for play, treats, and indoor stimulation.',
     products: [
       {
@@ -108,6 +113,7 @@ const categories = [
   },
   {
     name: 'Cleaning & Odor Control',
+    label: 'Clean home',
     intro: 'Practical choices for fur, accidents, and fresh-feeling spaces.',
     products: [
       {
@@ -130,6 +136,7 @@ const categories = [
   },
   {
     name: 'Home Safety Items',
+    label: 'Home safety',
     intro: 'Helpful home-check tools for comfortable stays and peace of mind.',
     products: [
       {
@@ -152,6 +159,7 @@ const categories = [
   },
   {
     name: 'Travel Pet Supplies',
+    label: 'Travel',
     intro: 'Packable food and water solutions for road trips and adventures.',
     products: [
       {
@@ -201,20 +209,55 @@ function productCard(product, categoryName) {
     </article>`;
 }
 
-document.querySelector('#product-categories').innerHTML = categories
+const categoryFilters = document.querySelector('#category-filters');
+const categoryResults = document.querySelector('#product-categories');
+
+function renderCategory(activeIndex) {
+  const category = categories[activeIndex];
+  categoryFilters.querySelectorAll('button').forEach((button, index) => {
+    button.classList.toggle('active', index === activeIndex);
+    button.setAttribute('aria-selected', String(index === activeIndex));
+    button.tabIndex = index === activeIndex ? 0 : -1;
+  });
+
+  categoryResults.innerHTML = `
+    <section class="category" role="tabpanel" aria-labelledby="category-tab-${activeIndex}">
+      <div class="category-heading">
+        <div>
+          <h3>${category.name}</h3>
+          <p class="category-intro">${category.intro}</p>
+        </div>
+        <span class="result-count">${category.products.length} ${category.products.length === 1 ? 'pick' : 'picks'}</span>
+      </div>
+      <div class="products-grid">
+        ${category.products.map((product) => productCard(product, category.name)).join('')}
+      </div>
+    </section>`;
+}
+
+categoryFilters.setAttribute('role', 'tablist');
+categoryFilters.innerHTML = categories
   .map(
-    (category) => `
-      <section class="category">
-        <div class="category-heading">
-          <div>
-            <h2>${category.name}</h2>
-            <p class="category-intro">${category.intro}</p>
-          </div>
-          <span class="result-count">${category.products.length} ${category.products.length === 1 ? 'pick' : 'picks'}</span>
-        </div>
-        <div class="products-grid">
-          ${category.products.map((product) => productCard(product, category.name)).join('')}
-        </div>
-      </section>`,
+    (category, index) => `
+      <button class="category-filter" id="category-tab-${index}" type="button" role="tab" aria-controls="product-categories" data-index="${index}">
+        ${category.label}
+      </button>`,
   )
   .join('');
+
+categoryFilters.addEventListener('click', (event) => {
+  const button = event.target.closest('.category-filter');
+  if (!button) return;
+  renderCategory(Number(button.dataset.index));
+});
+
+categoryFilters.addEventListener('keydown', (event) => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  const currentIndex = Number(document.activeElement.dataset.index);
+  const movement = event.key === 'ArrowRight' ? 1 : -1;
+  const nextIndex = (currentIndex + movement + categories.length) % categories.length;
+  categoryFilters.querySelector(`[data-index="${nextIndex}"]`).focus();
+  renderCategory(nextIndex);
+});
+
+renderCategory(0);
