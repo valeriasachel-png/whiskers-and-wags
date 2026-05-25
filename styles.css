@@ -1546,20 +1546,15 @@ textarea {
   }
 
   .category-filters {
-    flex-wrap: nowrap;
+    display: grid;
     gap: 8px;
-    margin: 0 -18px 14px;
-    overflow-x: auto;
-    padding: 0 18px 7px;
-    scrollbar-width: none;
-  }
-
-  .category-filters::-webkit-scrollbar {
-    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0 0 16px;
   }
 
   .category-filter {
-    flex-shrink: 0;
+    text-align: center;
+    width: 100%;
     padding: 10px 15px;
   }
 
