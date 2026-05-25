@@ -74,6 +74,13 @@ function renderFooter() {
 
 document.querySelector('[data-site-header]').innerHTML = renderHeader();
 document.querySelector('[data-site-footer]').innerHTML = renderFooter();
+document.body.insertAdjacentHTML(
+  'beforeend',
+  `<div class="mobile-actions" aria-label="Quick actions">
+    <a href="/request.html">Request Care</a>
+    <a href="tel:${business.phones[0].replace(/\D/g, '')}">Call Now</a>
+  </div>`,
+);
 
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.primary-nav');
@@ -87,5 +94,20 @@ nav?.addEventListener('click', (event) => {
   if (event.target.matches('a')) {
     nav.classList.remove('open');
     menuButton?.setAttribute('aria-expanded', 'false');
+  }
+});
+
+document.addEventListener('click', (event) => {
+  if (nav?.classList.contains('open') && !nav.contains(event.target) && !menuButton?.contains(event.target)) {
+    nav.classList.remove('open');
+    menuButton?.setAttribute('aria-expanded', 'false');
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && nav?.classList.contains('open')) {
+    nav.classList.remove('open');
+    menuButton?.setAttribute('aria-expanded', 'false');
+    menuButton.focus();
   }
 });

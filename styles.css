@@ -172,6 +172,10 @@ h3 {
   width: 46px;
 }
 
+.mobile-actions {
+  display: none;
+}
+
 .hero {
   padding: 38px 0 70px;
   position: relative;
@@ -276,7 +280,7 @@ h3 {
   border-radius: 36px;
   height: 535px;
   object-fit: cover;
-  object-position: 56% center;
+  object-position: center 38%;
   width: 100%;
 }
 
@@ -666,19 +670,18 @@ textarea {
 }
 
 .pet-card {
+  content-visibility: auto;
+  overflow: hidden;
   padding: 12px 12px 22px;
 }
 
 .pet-photo {
-  align-items: center;
   background: var(--sand);
   border-radius: 16px;
-  color: var(--terracotta);
-  display: flex;
-  font-size: 3.5rem;
-  height: 220px;
-  justify-content: center;
+  height: 265px;
   margin-bottom: 19px;
+  object-fit: cover;
+  width: 100%;
 }
 
 .pet-card h3,
@@ -869,7 +872,8 @@ textarea {
     padding: 10px;
     position: absolute;
     right: 24px;
-    top: 73px;
+    top: calc(100% - 5px);
+    z-index: 50;
   }
 
   .primary-nav.open {
@@ -916,6 +920,10 @@ textarea {
 }
 
 @media (max-width: 680px) {
+  body {
+    padding-bottom: 67px;
+  }
+
   .container {
     padding: 0 18px;
   }
@@ -928,6 +936,18 @@ textarea {
     font-size: 1.15rem;
   }
 
+  .brand small {
+    font-size: 0.68rem;
+  }
+
+  h1 {
+    font-size: clamp(2.35rem, 13vw, 3.15rem);
+  }
+
+  h2 {
+    font-size: clamp(1.65rem, 8vw, 2.1rem);
+  }
+
   .hero {
     padding: 22px 0 49px;
   }
@@ -938,7 +958,7 @@ textarea {
 
   .hero-photo {
     border-radius: 25px;
-    height: 330px;
+    height: min(400px, 98vw);
   }
 
   .photo-badge {
@@ -948,7 +968,7 @@ textarea {
   }
 
   .section {
-    padding: 52px 0;
+    padding: 45px 0;
   }
 
   .cards-grid,
@@ -975,6 +995,14 @@ textarea {
     padding: 21px 18px;
   }
 
+  .gallery-grid {
+    gap: 17px;
+  }
+
+  .pet-photo {
+    height: min(340px, 78vw);
+  }
+
   .form-actions {
     align-items: stretch;
     flex-direction: column;
@@ -990,5 +1018,46 @@ textarea {
 
   .product-image {
     height: 98px;
+  }
+
+  .mobile-actions {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    bottom: 0;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    left: 0;
+    padding: 9px 14px max(9px, env(safe-area-inset-bottom));
+    position: fixed;
+    right: 0;
+    z-index: 60;
+  }
+
+  .mobile-actions a {
+    align-items: center;
+    background: var(--terracotta);
+    border-radius: 999px;
+    color: var(--white);
+    display: flex;
+    font-size: 0.93rem;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 46px;
+  }
+
+  .mobile-actions a:last-child {
+    background: var(--sage-dark);
+  }
+}
+
+@media (max-width: 420px) {
+  .product-card {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  .product-image {
+    height: 78px;
   }
 }
