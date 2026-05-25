@@ -4,3 +4,15 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
+
+/styles.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+/shared.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/picks.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/request.js
+  Cache-Control: public, max-age=0, must-revalidate
