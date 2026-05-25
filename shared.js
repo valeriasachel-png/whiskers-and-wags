@@ -17,7 +17,14 @@ const navLinks = [
 
 function currentPath() {
   const path = window.location.pathname;
-  return path === '/index.html' ? '/' : path;
+  const cleanPageAliases = {
+    '/gallery': '/gallery.html',
+    '/picks': '/picks.html',
+    '/privacy': '/privacy.html',
+    '/request': '/request.html',
+  };
+  if (path === '/index.html') return '/';
+  return cleanPageAliases[path] ?? path;
 }
 
 function renderHeader() {
