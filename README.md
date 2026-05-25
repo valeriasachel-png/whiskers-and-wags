@@ -4,8 +4,8 @@ A responsive multi-page website for a pet sitting and home sitting business. It 
 
 - Welcoming home page with services and calls to action
 - Accessible request form with multi-date calendar selection
-- Gallery and testimonial placeholders ready for client content
-- Affiliate product recommendations with Amazon disclosure
+- Photo gallery with testimonials ready for approved client quotes
+- Affiliate product recommendations with active Amazon tracking disclosure
 - Server-side form delivery through a Cloudflare Pages Function and Resend
 - Basic bot-trap protection for request submissions
 
@@ -47,11 +47,11 @@ For deployment, configure the same values in Cloudflare Pages. Save `RESEND_API_
 - Business contact information and navigation: `shared.js`
 - Live destination email and sender configuration: Cloudflare Pages **Settings > Variables and Secrets**
 - Local-only email testing configuration: `.env`
-- Hero image shown on the site: `assets/hero-pets.jpg` (the original generated PNG is retained for future edits)
-- Gallery photo placeholders and testimonials: `gallery.html`
-- Product recommendations and Amazon affiliate URLs: `picks.js`
+- Hero and story photos shown on the home page: `index.html` and `assets/gallery/`
+- Gallery photos and approved testimonials: `gallery.html`
+- Product recommendations and Amazon tracking ID: `picks.js`
 
-Replace gallery placeholders only with client photos and quotes you have permission to publish.
+Publish client photos and quotes only when you have permission to use them.
 
 ## Publish on Cloudflare Pages
 
@@ -83,13 +83,12 @@ Do not announce or submit the website to Amazon Associates until these are compl
 
 ## Amazon Associates Setup
 
-The Pet Care Picks page contains real curated product candidates, but its links stay as ordinary Amazon searches until your own official affiliate links are added.
+The Pet Care Picks page contains curated named product options. Its Amazon buttons use the public Associates tracking ID configured in `picks.js` (`whiskersan07f-20`) so tagged search referrals can be attributed to this store.
 
-1. Publish the site to a public web address. Amazon's current Participation Requirements say an application site must contain original content and be publicly available; `localhost` does not qualify.
-2. Apply at [Amazon Associates Central](https://affiliate-program.amazon.com/) using that public site address. Complete account, identity, tax, and payment information directly with Amazon.
-3. After applying, use Amazon's own link-building tools, such as SiteStripe or Product Linking, to generate a Special Link for each recommended product.
-4. Paste each Special Link into the matching `affiliateLink` value in `picks.js`. When a value is present, the card changes from `View on Amazon` to `Shop on Amazon`, marks the link as sponsored, and activates the required Associate disclosure near the top of the page.
-5. For product photos, use only images supplied through Amazon's approved linking/API tools. The current category icons avoid misrepresenting an actual listing.
+1. Keep the tracking ID in `amazonTrackingId` updated if the Amazon Associates store ID ever changes.
+2. The current links open Amazon search results for each named recommendation and append the tracking ID automatically.
+3. To send visitors to one exact size, color, or item listing later, replace a generated destination with a Special Link produced in Amazon SiteStripe or Product Linking.
+4. For product photos, use only images supplied through Amazon's approved linking/API tools. The current stylized product previews avoid misrepresenting an actual listing.
 
 The page intentionally does not show prices or claim current availability. Amazon's current policies restrict displaying those details unless Amazon serves them or they are obtained through an approved API.
 
