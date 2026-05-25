@@ -6,8 +6,8 @@ A responsive multi-page website for a pet sitting and home sitting business. It 
 - Accessible request form with multi-date calendar selection
 - Gallery and testimonial placeholders ready for client content
 - Affiliate product recommendations with Amazon disclosure
-- Server-side form delivery through Resend
-- Basic bot-trap and rate-limit protection for request submissions
+- Server-side form delivery through a Cloudflare Pages Function and Resend
+- Basic bot-trap protection for request submissions
 
 ## Run Locally
 
@@ -23,7 +23,7 @@ On a machine with Node.js 18 or newer already installed, `node server.mjs` works
 
 ## Connect Request Emails
 
-The form deliberately does not use `mailto:` or put credentials in browser code. Requests post to `/api/requests`, where `server.mjs` validates them and sends email through [Resend](https://resend.com).
+The form deliberately does not use `mailto:` or put credentials in browser code. On the live site, requests post to `/api/requests`, where `functions/api/requests.js` validates them and sends email through [Resend](https://resend.com). `server.mjs` provides the same endpoint for local testing.
 
 1. Copy `.env.example` to `.env`.
 2. Confirm `BUSINESS_EMAIL=whiskersandwags811@gmail.com` is the inbox that should receive booking requests.
@@ -40,35 +40,35 @@ EMAIL_FROM=Whiskers & Wags <bookings@whiskersandwagsms.com>
 PORT=4173
 ```
 
-For deployment, host this as a Node service and configure those same environment variables in the hosting dashboard. Do not commit `.env` or expose `RESEND_API_KEY` in frontend files.
+For deployment, configure the same values in Cloudflare Pages. Save `RESEND_API_KEY` as an encrypted secret. Do not commit `.env` or expose `RESEND_API_KEY` in frontend files.
 
 ## Customize Content
 
 - Business contact information and navigation: `shared.js`
-- Destination email and sender configuration: `.env`
+- Live destination email and sender configuration: Cloudflare Pages **Settings > Variables and Secrets**
+- Local-only email testing configuration: `.env`
 - Hero image shown on the site: `assets/hero-pets.jpg` (the original generated PNG is retained for future edits)
 - Gallery photo placeholders and testimonials: `gallery.html`
 - Product recommendations and Amazon affiliate URLs: `picks.js`
 
 Replace gallery placeholders only with client photos and quotes you have permission to publish.
 
-## Publish on Render
+## Publish on Cloudflare Pages
 
-This project includes `render.yaml` for a paid Render web service, which is appropriate for an official business launch because it keeps the booking form backend running.
+Cloudflare Pages hosts the website and runs the booking email handler at `/api/requests` through `functions/api/requests.js`, so a continuously running paid server is not required.
 
-Before creating the live service:
+1. In Cloudflare, open **Workers & Pages > Create application > Pages > Import an existing Git repository**.
+2. Connect the GitHub repository and select `whiskers-and-wags`.
+3. Set the production branch to `main`, the build command to `exit 0`, and the build output directory to `/`.
+4. Deploy once to receive a temporary `*.pages.dev` address.
+5. Open the Pages project **Settings > Variables and Secrets** and add:
+   - `BUSINESS_EMAIL`: `whiskersandwags811@gmail.com`
+   - `EMAIL_FROM`: `Whiskers & Wags <bookings@whiskersandwagsms.com>`
+   - `RESEND_API_KEY`: the Resend sending key, saved as an encrypted secret
+6. Redeploy after saving the variables, then submit a real test request.
+7. Under the Pages project **Custom domains**, add `whiskersandwagsms.com` and `www.whiskersandwagsms.com`.
 
-1. Put the project in a GitHub repository.
-2. In Render, choose **New > Blueprint** and connect the repository.
-3. Render reads `render.yaml` and creates the `whiskers-and-wags` Node web service.
-4. Add these secret environment variables when prompted:
-   - `BUSINESS_EMAIL`: the inbox that should receive customer requests.
-   - `RESEND_API_KEY`: your Resend sending key.
-   - `EMAIL_FROM`: the verified-domain sender, for example `Whiskers & Wags <bookings@whiskersandwagsms.com>`.
-5. Verify the Render-provided public URL before connecting a custom domain.
-6. Add your purchased domain in the Render dashboard and follow Render's DNS instructions in Cloudflare.
-
-The server provides `/health` for Render health checks and applies security headers to published pages.
+The `_headers` file provides browser security headers on Cloudflare Pages. The booking function keeps the Resend API key on Cloudflare, never in the public website code.
 
 ## Public Launch Checklist
 
@@ -78,7 +78,7 @@ Do not announce or submit the website to Amazon Associates until these are compl
 - Configure booking email delivery and send a successful test request.
 - Keep the gallery and testimonials as coming-soon placeholders until you have client permission.
 - Purchased domain: `whiskersandwagsms.com` (registered through Cloudflare on May 24, 2026).
-- Connect `whiskersandwagsms.com` to the Render service after its first successful deploy.
+- Connect `whiskersandwagsms.com` to the Cloudflare Pages project after its first successful deploy.
 - Review your local business requirements, insurance, scheduling policies, and privacy handling for customer addresses and pet-care details.
 
 ## Amazon Associates Setup
@@ -98,3 +98,9 @@ Official references:
 - [Amazon Associates Central](https://affiliate-program.amazon.com/)
 - [Associates Program Policies](https://affiliate-program.amazon.com/help/operating/policies)
 - [Associates Program Operating Agreement](https://affiliate-program.amazon.com/help/operating/agreement/)
+
+## Deployment References
+
+- [Cloudflare Pages static HTML deployment](https://developers.cloudflare.com/pages/framework-guides/deploy-anything/)
+- [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/)
+- [Cloudflare Pages variables and secrets](https://developers.cloudflare.com/pages/functions/bindings/)

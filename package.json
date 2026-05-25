@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check shared.js && node --check request.js && node --check picks.js"
+    "check": "node --check server.mjs && node --check functions/api/requests.js && node --check shared.js && node --check request.js && node --check picks.js"
   },
   "engines": {
     "node": ">=18"
