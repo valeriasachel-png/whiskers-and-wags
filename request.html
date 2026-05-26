@@ -15,118 +15,186 @@
     <meta property="og:image" content="https://whiskersandwagsms.com/assets/hero-pets-mobile-v2.jpg">
     <meta property="og:image:alt" content="A golden retriever and tabby cat sitting together on a welcoming front porch">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/styles.css?v=20260525-6">
+    <link rel="stylesheet" href="/styles.css?v=20260525-7">
     <script src="/shared.js?v=20260525-6" defer></script>
-    <script src="/request.js?v=20260525-3" defer></script>
+    <script src="/request.js?v=20260525-4" defer></script>
   </head>
-  <body>
+  <body class="request-page">
     <div data-site-header></div>
     <main>
       <section class="page-hero">
         <div class="container">
-          <div class="eyebrow">Book With Care</div>
+          <div class="eyebrow">Start With A Simple Request</div>
           <h1>Request Pet Sitting</h1>
-          <p>Tell us about your pets, home, and schedule. We will follow up to confirm availability and all care details.</p>
+          <p>Share your dates and pet basics in just a few steps. We will personally follow up to confirm availability.</p>
         </div>
       </section>
-      <div class="container form-layout">
-        <aside class="panel sticky-panel" aria-label="Requested date selection">
-          <h2>Select your dates</h2>
-          <p class="muted">Choose one or more days when you need care.</p>
-          <div class="calendar" id="calendar">
-            <div class="calendar-head">
-              <button class="calendar-control" id="previous-month" type="button" aria-label="Previous month">&lsaquo;</button>
-              <h3 id="calendar-month" aria-live="polite"></h3>
-              <button class="calendar-control" id="next-month" type="button" aria-label="Next month">&rsaquo;</button>
-            </div>
-            <div class="calendar-week" aria-hidden="true">
-              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-            </div>
-            <div class="calendar-days" id="calendar-days"></div>
+      <div class="container booking-layout">
+        <aside class="booking-assurance" aria-label="How your request works">
+          <div class="eyebrow">Thoughtful &amp; Private</div>
+          <h2>First, let&apos;s see if your dates fit.</h2>
+          <p>We only ask for the essentials now. Once availability is confirmed, we will gather detailed routines and home-care information privately.</p>
+          <div class="assurance-list">
+            <div><span aria-hidden="true">1</span><p><strong>Send a request</strong>Choose your dates and tell us who needs care.</p></div>
+            <div><span aria-hidden="true">2</span><p><strong>Personal follow-up</strong>We reply by your preferred method to confirm availability.</p></div>
+            <div><span aria-hidden="true">3</span><p><strong>Care details later</strong>Access instructions, emergency contacts, and medical routines stay private until needed.</p></div>
           </div>
-          <div class="selected-summary" id="date-summary" aria-live="polite">
-            <strong>Requested dates</strong>
-            No dates selected yet.
-          </div>
-          <div class="notice">Dates are requests until availability is confirmed.</div>
         </aside>
 
-        <form class="panel request-form" id="request-form">
-          <h2>Pet & Home Details</h2>
+        <form class="panel request-form booking-flow" id="request-form" novalidate>
+          <div class="booking-progress" aria-label="Request progress">
+            <p class="step-count" id="step-count">Step 1 of 3</p>
+            <ol>
+              <li class="active" data-step-indicator="1" aria-current="step"><span>1</span><strong>Dates</strong></li>
+              <li data-step-indicator="2"><span>2</span><strong>Pets</strong></li>
+              <li data-step-indicator="3"><span>3</span><strong>Contact</strong></li>
+            </ol>
+            <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+          </div>
+          <div class="form-status" id="form-status" role="status" aria-live="polite" tabindex="-1"></div>
+          <p class="step-announcement sr-only" id="step-announcement" aria-live="polite"></p>
           <div class="field-trap" aria-hidden="true">
             <label for="website">Leave this field empty</label>
             <input id="website" name="website" tabindex="-1" autocomplete="off">
           </div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="fullName">Full Name <span class="required" aria-hidden="true">*</span></label>
-              <input id="fullName" name="fullName" autocomplete="name" required>
+
+          <section class="booking-step active" data-step="1" aria-labelledby="step-one-title">
+            <div class="step-heading">
+              <h2 id="step-one-title" tabindex="-1">When do you need care?</h2>
+              <p>Choose one or more requested dates, your service, and the community where care is needed.</p>
             </div>
-            <div class="field">
-              <label for="phone">Phone Number <span class="required" aria-hidden="true">*</span></label>
-              <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+            <div class="calendar-step-grid">
+              <div class="calendar" id="calendar">
+                <div class="calendar-head">
+                  <button class="calendar-control" id="previous-month" type="button" aria-label="Previous month">&lsaquo;</button>
+                  <h3 id="calendar-month" aria-live="polite"></h3>
+                  <button class="calendar-control" id="next-month" type="button" aria-label="Next month">&rsaquo;</button>
+                </div>
+                <div class="calendar-week" aria-hidden="true">
+                  <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                </div>
+                <div class="calendar-days" id="calendar-days"></div>
+              </div>
+              <div class="step-fields">
+                <div class="field">
+                  <label for="serviceType">Type of Service <span class="required" aria-hidden="true">*</span></label>
+                  <select id="serviceType" name="serviceType" required>
+                    <option value="">Select service</option>
+                    <option>Pet Sitting</option>
+                    <option>Home Sitting</option>
+                    <option>Both</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="serviceArea">Service Area <span class="required" aria-hidden="true">*</span></label>
+                  <select id="serviceArea" name="serviceArea" required>
+                    <option value="">Select area</option>
+                    <option>Madison</option>
+                    <option>Flowood</option>
+                    <option>Ridgeland</option>
+                    <option>Gluckstadt</option>
+                    <option>Northeast Jackson</option>
+                    <option>Other / Ask Us</option>
+                  </select>
+                </div>
+                <input id="requestedDates" name="requestedDates" type="hidden">
+                <div class="selected-summary" id="date-summary" aria-live="polite">
+                  <strong>Requested dates</strong>
+                  <span>No dates selected yet.</span>
+                </div>
+                <div class="notice">Dates are requests until we personally confirm availability.</div>
+              </div>
             </div>
-            <div class="field full">
-              <label for="address">Address <span class="required" aria-hidden="true">*</span></label>
-              <input id="address" name="address" autocomplete="street-address" required>
+            <div class="step-actions step-actions-next">
+              <button class="button" type="button" data-next-step>Continue to Pets <span aria-hidden="true">&rarr;</span></button>
             </div>
-            <div class="field">
-              <label for="email">Email Address <span class="required" aria-hidden="true">*</span></label>
-              <input id="email" name="email" type="email" autocomplete="email" required>
+          </section>
+
+          <section class="booking-step" data-step="2" aria-labelledby="step-two-title" hidden>
+            <div class="step-heading">
+              <h2 id="step-two-title" tabindex="-1">Who needs care?</h2>
+              <p>Just the pet basics for now. We will learn the detailed routine after your dates are confirmed.</p>
             </div>
-            <div class="field">
-              <label for="serviceType">Type of Service <span class="required" aria-hidden="true">*</span></label>
-              <select id="serviceType" name="serviceType" required>
-                <option value="">Select service</option>
-                <option>Pet Sitting</option>
-                <option>Home Sitting</option>
-                <option>Both</option>
-              </select>
+            <div class="field-grid">
+              <div class="field">
+                <label for="petNames">Pet Names <span class="required" aria-hidden="true">*</span></label>
+                <input id="petNames" name="petNames" autocomplete="off" required placeholder="Milo and Sunny">
+              </div>
+              <div class="field">
+                <label for="petTypes">Type of Pets <span class="required" aria-hidden="true">*</span></label>
+                <input id="petTypes" name="petTypes" placeholder="Dog, cat, rabbit..." required>
+              </div>
+              <div class="field">
+                <label for="petCount">Number of Pets <span class="required" aria-hidden="true">*</span></label>
+                <input id="petCount" name="petCount" type="number" min="1" max="30" required>
+              </div>
+              <div class="field full">
+                <label for="initialNeeds">Anything we should know right away? <span class="required" aria-hidden="true">*</span></label>
+                <textarea id="initialNeeds" name="initialNeeds" required placeholder="Example: two friendly dogs who need evening visits, or a senior cat needing calm check-ins."></textarea>
+                <span class="help">Please do not include keys, alarm codes, or sensitive entry instructions here.</span>
+              </div>
             </div>
-            <div class="field full">
-              <label for="requestedDates">Requested Dates <span class="required" aria-hidden="true">*</span></label>
-              <input id="requestedDates" name="requestedDates" readonly required placeholder="Choose dates using the calendar">
-              <span class="help">Select one or multiple dates in the calendar.</span>
+            <div class="privacy-note">
+              <strong>We&apos;ll collect detailed care information later.</strong>
+              Feeding routines, emergency contacts, medications, and home access details are gathered privately after availability is confirmed.
             </div>
-            <div class="field">
-              <label for="petNames">Pet Names <span class="required" aria-hidden="true">*</span></label>
-              <input id="petNames" name="petNames" required>
+            <div class="step-actions">
+              <button class="button button-secondary" type="button" data-previous-step>Back</button>
+              <button class="button" type="button" data-next-step>Continue to Contact <span aria-hidden="true">&rarr;</span></button>
             </div>
-            <div class="field">
-              <label for="petTypes">Type of Pets <span class="required" aria-hidden="true">*</span></label>
-              <input id="petTypes" name="petTypes" placeholder="Dog, cat, rabbit..." required>
+          </section>
+
+          <section class="booking-step" data-step="3" aria-labelledby="step-three-title" hidden>
+            <div class="step-heading">
+              <h2 id="step-three-title" tabindex="-1">How should we reach you?</h2>
+              <p>We will reply personally to discuss availability and the next care steps.</p>
             </div>
-            <div class="field">
-              <label for="petCount">Number of Pets <span class="required" aria-hidden="true">*</span></label>
-              <input id="petCount" name="petCount" type="number" min="1" max="30" required>
+            <div class="field-grid">
+              <div class="field">
+                <label for="fullName">Full Name <span class="required" aria-hidden="true">*</span></label>
+                <input id="fullName" name="fullName" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="phone">Phone Number <span class="required" aria-hidden="true">*</span></label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+              </div>
+              <div class="field full">
+                <label for="email">Email Address <span class="required" aria-hidden="true">*</span></label>
+                <input id="email" name="email" type="email" autocomplete="email" required>
+              </div>
+              <fieldset class="field full contact-method">
+                <legend>Preferred Reply Method <span class="required" aria-hidden="true">*</span></legend>
+                <div class="choice-cards">
+                  <label><input type="radio" name="preferredContact" value="Text" required><span>Text</span></label>
+                  <label><input type="radio" name="preferredContact" value="Call"><span>Call</span></label>
+                  <label><input type="radio" name="preferredContact" value="Email"><span>Email</span></label>
+                </div>
+              </fieldset>
             </div>
-            <div class="field">
-              <label for="emergencyContact">Emergency Contact <span class="required" aria-hidden="true">*</span></label>
-              <input id="emergencyContact" name="emergencyContact" placeholder="Name and phone number" required>
+            <section class="request-review" aria-labelledby="review-title">
+              <h3 id="review-title">Your request at a glance</h3>
+              <div class="review-chips" id="review-chips"></div>
+              <p id="review-contact"></p>
+            </section>
+            <div class="step-actions">
+              <button class="button button-secondary" type="button" data-previous-step>Back</button>
+              <button class="button" id="submit-request" type="submit">Send My Request</button>
             </div>
-            <div class="field full">
-              <label for="careInstructions">Pet Care Instructions <span class="required" aria-hidden="true">*</span></label>
-              <textarea id="careInstructions" name="careInstructions" required placeholder="Routines, personality, entry instructions, favorite toys..."></textarea>
-            </div>
-            <div class="field">
-              <label for="feedingSchedule">Feeding Schedule</label>
-              <textarea id="feedingSchedule" name="feedingSchedule"></textarea>
-            </div>
-            <div class="field">
-              <label for="medicalNeeds">Medication or Special Needs</label>
-              <textarea id="medicalNeeds" name="medicalNeeds"></textarea>
-            </div>
-            <div class="field full">
-              <label for="additionalNotes">Additional Notes</label>
-              <textarea id="additionalNotes" name="additionalNotes" placeholder="Mail, plants, home check-in needs, or anything else we should know."></textarea>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="button" id="submit-request" type="submit">Submit Request</button>
-            <span class="help">Required fields are marked with <span class="required">*</span>.</span>
-          </div>
-          <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+            <p class="submission-note">By sending this request, you are asking about availability. No visit is booked until we confirm with you.</p>
+          </section>
         </form>
+
+        <section class="panel request-success" id="request-success" aria-live="polite" tabindex="-1" hidden>
+          <span class="success-paw" aria-hidden="true">&#128062;</span>
+          <div class="eyebrow">Request Sent</div>
+          <h2>Thank you! We&apos;ve got your request.</h2>
+          <p id="success-message">We will contact you soon to confirm availability.</p>
+          <div class="success-next">
+            <strong>What happens next?</strong>
+            <p>We will review your dates, reach out personally, and gather detailed care information only after confirming the fit.</p>
+          </div>
+          <button class="button button-secondary" id="new-request" type="button">Send Another Request</button>
+        </section>
       </div>
     </main>
     <div data-site-footer></div>

@@ -2,13 +2,23 @@ const form = document.querySelector('#request-form');
 const daysContainer = document.querySelector('#calendar-days');
 const monthLabel = document.querySelector('#calendar-month');
 const datesInput = document.querySelector('#requestedDates');
-const dateSummary = document.querySelector('#date-summary');
+const dateSummary = document.querySelector('#date-summary span');
 const statusBox = document.querySelector('#form-status');
 const submitButton = document.querySelector('#submit-request');
+const successPanel = document.querySelector('#request-success');
+const successMessage = document.querySelector('#success-message');
+const reviewChips = document.querySelector('#review-chips');
+const reviewContact = document.querySelector('#review-contact');
+const stepCount = document.querySelector('#step-count');
+const progressFill = document.querySelector('#progress-fill');
+const stepAnnouncement = document.querySelector('#step-announcement');
+const steps = [...document.querySelectorAll('.booking-step')];
+const indicators = [...document.querySelectorAll('[data-step-indicator]')];
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+let currentStep = 1;
 const selectedDates = new Set();
 
 function toDateKey(date) {
@@ -27,12 +37,38 @@ function readableDate(dateKey) {
   });
 }
 
+function fieldValue(name) {
+  return form.elements[name]?.value.trim() || '';
+}
+
+function updateReview() {
+  const chips = [
+    [...selectedDates].sort().map(readableDate).join(', '),
+    fieldValue('serviceType'),
+    fieldValue('serviceArea'),
+    fieldValue('petNames'),
+    fieldValue('petTypes'),
+  ].filter(Boolean);
+
+  reviewChips.innerHTML = '';
+  chips.forEach((text) => {
+    const chip = document.createElement('span');
+    chip.textContent = text;
+    reviewChips.append(chip);
+  });
+
+  const preference = form.querySelector('input[name="preferredContact"]:checked')?.value;
+  reviewContact.textContent = preference
+    ? `Preferred reply method: ${preference}`
+    : 'Choose how you would like us to reply.';
+}
+
 function updateSelectedDates() {
   const orderedDates = [...selectedDates].sort();
   const text = orderedDates.map(readableDate).join(', ');
   datesInput.value = text;
-  datesInput.setCustomValidity(orderedDates.length ? '' : 'Please select at least one requested date.');
-  dateSummary.innerHTML = `<strong>Requested dates</strong>${text || 'No dates selected yet.'}`;
+  dateSummary.textContent = text || 'No dates selected yet.';
+  updateReview();
 }
 
 function renderCalendar() {
@@ -74,8 +110,64 @@ function renderCalendar() {
   }
 }
 
+function clearStatus() {
+  statusBox.className = 'form-status';
+  statusBox.textContent = '';
+}
+
+function showError(message) {
+  statusBox.textContent = message;
+  statusBox.className = 'form-status error';
+  statusBox.focus();
+}
+
+function setStep(step, shouldFocus = true) {
+  currentStep = step;
+  steps.forEach((panel) => {
+    const active = Number(panel.dataset.step) === step;
+    panel.hidden = !active;
+    panel.classList.toggle('active', active);
+  });
+  indicators.forEach((indicator) => {
+    const active = Number(indicator.dataset.stepIndicator) === step;
+    indicator.classList.toggle('active', active);
+    if (active) indicator.setAttribute('aria-current', 'step');
+    else indicator.removeAttribute('aria-current');
+  });
+  stepCount.textContent = `Step ${step} of 3`;
+  progressFill.style.width = `${(step / 3) * 100}%`;
+  stepAnnouncement.textContent = `${stepCount.textContent}: ${steps[step - 1].querySelector('h2').textContent}`;
+  clearStatus();
+  updateReview();
+  if (shouldFocus) steps[step - 1].querySelector('h2').focus();
+}
+
+function validateControl(control) {
+  if (control.checkValidity()) return true;
+  control.reportValidity();
+  control.focus();
+  return false;
+}
+
+function validateStep(step) {
+  if (step === 1 && !selectedDates.size) {
+    showError('Please select at least one requested date in the calendar.');
+    daysContainer.querySelector('button:not(:disabled)')?.focus();
+    return false;
+  }
+
+  const controls = steps[step - 1].querySelectorAll('input:not([type="hidden"]), select, textarea');
+  for (const control of controls) {
+    if (!validateControl(control)) return false;
+  }
+  clearStatus();
+  return true;
+}
+
 document.querySelector('#previous-month').addEventListener('click', () => {
-  viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1);
+  const previous = new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1);
+  const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  if (previous >= currentMonth) viewMonth = previous;
   renderCalendar();
 });
 
@@ -84,27 +176,28 @@ document.querySelector('#next-month').addEventListener('click', () => {
   renderCalendar();
 });
 
+form.querySelectorAll('[data-next-step]').forEach((button) => {
+  button.addEventListener('click', () => {
+    if (validateStep(currentStep)) setStep(currentStep + 1);
+  });
+});
+
+form.querySelectorAll('[data-previous-step]').forEach((button) => {
+  button.addEventListener('click', () => setStep(currentStep - 1));
+});
+
+form.addEventListener('input', updateReview);
+form.addEventListener('change', updateReview);
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
-  updateSelectedDates();
-  statusBox.className = 'form-status';
-
-  if (!selectedDates.size) {
-    statusBox.textContent = 'Please select at least one requested date in the calendar.';
-    statusBox.classList.add('error');
-    datesInput.focus();
-    return;
-  }
-
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
+  if (!validateStep(3)) return;
 
   const payload = Object.fromEntries(new FormData(form).entries());
   payload.requestedDates = [...selectedDates].sort();
   submitButton.disabled = true;
   submitButton.textContent = 'Sending Request...';
+  clearStatus();
 
   try {
     const response = await fetch('/api/requests', {
@@ -116,20 +209,31 @@ form.addEventListener('submit', async (event) => {
     if (!response.ok) {
       throw new Error(result.message || 'We could not send your request. Please try again.');
     }
-    statusBox.textContent = "Thank you! Your request has been sent. We'll contact you soon to confirm availability.";
-    statusBox.classList.add('success');
-    form.reset();
-    selectedDates.clear();
-    renderCalendar();
-    updateSelectedDates();
+    const preference = payload.preferredContact.toLowerCase();
+    successMessage.textContent =
+      `Thank you! Your request has been sent. We'll contact you by ${preference} soon to confirm availability.`;
+    form.hidden = true;
+    successPanel.hidden = false;
+    successPanel.focus();
   } catch (error) {
-    statusBox.textContent = error.message;
-    statusBox.classList.add('error');
+    showError(error.message);
   } finally {
     submitButton.disabled = false;
-    submitButton.textContent = 'Submit Request';
+    submitButton.textContent = 'Send My Request';
   }
 });
 
-datesInput.setCustomValidity('Please select at least one requested date.');
+document.querySelector('#new-request').addEventListener('click', () => {
+  form.reset();
+  selectedDates.clear();
+  viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  renderCalendar();
+  updateSelectedDates();
+  successPanel.hidden = true;
+  form.hidden = false;
+  setStep(1);
+});
+
 renderCalendar();
+updateSelectedDates();
+setStep(1, false);

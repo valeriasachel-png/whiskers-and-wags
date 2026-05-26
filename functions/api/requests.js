@@ -20,9 +20,12 @@ function validateRequest(input) {
     phone: cleanText(input.phone, 60),
     email: cleanText(input.email, 160),
     serviceType: cleanText(input.serviceType, 40),
+    serviceArea: cleanText(input.serviceArea, 60),
+    preferredContact: cleanText(input.preferredContact, 20),
     petNames: cleanText(input.petNames, 160),
     petTypes: cleanText(input.petTypes, 100),
     petCount: cleanText(input.petCount, 3),
+    initialNeeds: cleanText(input.initialNeeds),
     careInstructions: cleanText(input.careInstructions),
     feedingSchedule: cleanText(input.feedingSchedule),
     medicalNeeds: cleanText(input.medicalNeeds),
@@ -34,18 +37,10 @@ function validateRequest(input) {
     : [];
   details.requestedDates = dates.join(', ');
 
-  const required = [
-    'fullName',
-    'address',
-    'phone',
-    'email',
-    'serviceType',
-    'petNames',
-    'petTypes',
-    'petCount',
-    'careInstructions',
-    'emergencyContact',
-  ];
+  const newFlow = Boolean(details.serviceArea || details.preferredContact || details.initialNeeds);
+  const required = newFlow
+    ? ['fullName', 'phone', 'email', 'serviceType', 'serviceArea', 'preferredContact', 'petNames', 'petTypes', 'petCount', 'initialNeeds']
+    : ['fullName', 'address', 'phone', 'email', 'serviceType', 'petNames', 'petTypes', 'petCount', 'careInstructions', 'emergencyContact'];
   if (required.some((field) => !details[field]) || !dates.length) {
     return { error: 'Please complete all required fields and select at least one date.' };
   }
@@ -54,6 +49,12 @@ function validateRequest(input) {
   }
   if (!['Pet Sitting', 'Home Sitting', 'Both'].includes(details.serviceType)) {
     return { error: 'Please choose a valid service type.' };
+  }
+  if (newFlow && !['Madison', 'Flowood', 'Ridgeland', 'Gluckstadt', 'Northeast Jackson', 'Other / Ask Us'].includes(details.serviceArea)) {
+    return { error: 'Please choose a valid service area.' };
+  }
+  if (newFlow && !['Text', 'Call', 'Email'].includes(details.preferredContact)) {
+    return { error: 'Please choose how you would like us to reply.' };
   }
   return { details };
 }
@@ -87,14 +88,17 @@ export async function onRequest({ request, env }) {
 
   const labels = {
     fullName: 'Full Name',
-    address: 'Address',
     phone: 'Phone Number',
     email: 'Email Address',
+    preferredContact: 'Preferred Reply Method',
     requestedDates: 'Requested Dates',
     serviceType: 'Type of Service',
+    serviceArea: 'Service Area',
     petNames: 'Pet Names',
     petTypes: 'Type of Pets',
     petCount: 'Number of Pets',
+    initialNeeds: 'Initial Needs Note',
+    address: 'Address (legacy request)',
     careInstructions: 'Pet Care Instructions',
     feedingSchedule: 'Feeding Schedule',
     medicalNeeds: 'Medication or Special Needs',

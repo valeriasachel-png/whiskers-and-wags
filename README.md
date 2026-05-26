@@ -3,7 +3,7 @@
 A responsive multi-page website for a pet sitting and home sitting business. It includes:
 
 - Welcoming home page with services and calls to action
-- Accessible request form with multi-date calendar selection
+- Accessible three-step request flow with multi-date calendar selection and essential-first intake
 - Photo gallery with testimonials ready for approved client quotes
 - Exact Amazon product recommendations with active Associates tracking disclosure
 - Server-side form delivery through a Cloudflare Pages Function and Resend
@@ -45,6 +45,7 @@ For deployment, configure the same values in Cloudflare Pages. Save `RESEND_API_
 ## Customize Content
 
 - Business contact information and navigation: `shared.js`
+- Booking steps, service areas, and reply methods: `request.html`, `request.js`, and `functions/api/requests.js`
 - Live destination email and sender configuration: Cloudflare Pages **Settings > Variables and Secrets**
 - Local-only email testing configuration: `.env`
 - Hero and story photos shown on the home page: `index.html` and `assets/gallery/`
