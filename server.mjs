@@ -88,8 +88,17 @@ function validateRequest(input) {
   details.requestedDates = dates.join(', ');
 
   const newFlow = Boolean(details.serviceArea || details.preferredContact || details.initialNeeds);
+  const needsPetDetails = details.serviceType !== 'Home Sitting';
   const required = newFlow
-    ? ['fullName', 'phone', 'email', 'serviceType', 'serviceArea', 'preferredContact', 'petNames', 'petTypes', 'petCount', 'initialNeeds']
+    ? [
+        'fullName',
+        'phone',
+        'email',
+        'serviceType',
+        'serviceArea',
+        'preferredContact',
+        ...(needsPetDetails ? ['petNames', 'petTypes', 'petCount', 'initialNeeds'] : []),
+      ]
     : ['fullName', 'address', 'phone', 'email', 'serviceType', 'petNames', 'petTypes', 'petCount', 'careInstructions', 'emergencyContact'];
   if (required.some((field) => !details[field]) || !dates.length) {
     return { error: 'Please complete all required fields and select at least one date.' };
@@ -144,6 +153,7 @@ async function submitRequest(request, response) {
     });
   }
 
+  const includePetDetails = validation.details.serviceType !== 'Home Sitting' || validation.details.petNames;
   const labels = {
     fullName: 'Full Name',
     phone: 'Phone Number',
@@ -152,16 +162,20 @@ async function submitRequest(request, response) {
     requestedDates: 'Requested Dates',
     serviceType: 'Type of Service',
     serviceArea: 'Service Area',
-    petNames: 'Pet Names',
-    petTypes: 'Type of Pets',
-    petCount: 'Number of Pets',
-    initialNeeds: 'Initial Needs Note',
-    address: 'Address (legacy request)',
-    careInstructions: 'Pet Care Instructions',
-    feedingSchedule: 'Feeding Schedule',
-    medicalNeeds: 'Medication or Special Needs',
-    emergencyContact: 'Emergency Contact',
-    additionalNotes: 'Additional Notes',
+    ...(includePetDetails
+      ? {
+          petNames: 'Pet Names',
+          petTypes: 'Type of Pets',
+          petCount: 'Number of Pets',
+          initialNeeds: 'Initial Needs Note',
+        }
+      : {}),
+    ...(validation.details.address ? { address: 'Address (legacy request)' } : {}),
+    ...(validation.details.careInstructions ? { careInstructions: 'Pet Care Instructions' } : {}),
+    ...(validation.details.feedingSchedule ? { feedingSchedule: 'Feeding Schedule' } : {}),
+    ...(validation.details.medicalNeeds ? { medicalNeeds: 'Medication or Special Needs' } : {}),
+    ...(validation.details.emergencyContact ? { emergencyContact: 'Emergency Contact' } : {}),
+    ...(validation.details.additionalNotes ? { additionalNotes: 'Additional Notes' } : {}),
   };
   const body = Object.entries(labels)
     .map(([key, label]) => `${label}:\n${validation.details[key] || 'Not provided'}`)

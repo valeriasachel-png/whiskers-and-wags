@@ -6,12 +6,17 @@
   --sage: #75927e;
   --sage-dark: #456052;
   --forest: #203d35;
+  --evergreen: #17352d;
+  --champagne: #c9a56d;
+  --champagne-soft: #eadbc3;
+  --linen: #fcf7ee;
   --ink: #263a35;
   --ink-light: #586760;
   --white: #ffffff;
   --border: #e8dacb;
   --shadow: 0 14px 38px rgba(72, 55, 41, 0.09);
   --shadow-deep: 0 28px 64px rgba(63, 46, 33, 0.15);
+  --shadow-luxe: 0 32px 80px rgba(39, 35, 27, 0.13), 0 3px 10px rgba(39, 35, 27, 0.05);
   --radius: 24px;
   --radius-small: 15px;
   --font-display: Georgia, 'Times New Roman', serif;
@@ -31,7 +36,9 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  background: linear-gradient(180deg, #fffaf3 0%, #fffdf9 30%, #fffaf3 100%);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(201, 165, 109, 0.08), transparent 36rem),
+    linear-gradient(180deg, #fffaf3 0%, #fffdf9 30%, #fffaf3 100%);
   font-family: var(--font-body);
   line-height: 1.6;
 }
@@ -107,11 +114,22 @@ h3 {
 
 .site-header {
   backdrop-filter: blur(14px);
-  background: rgba(255, 250, 243, 0.94);
-  border-bottom: 1px solid rgba(232, 218, 203, 0.7);
+  background: rgba(255, 251, 245, 0.95);
+  border-bottom: 1px solid rgba(201, 165, 109, 0.2);
   position: sticky;
   top: 0;
   z-index: 20;
+}
+
+.site-header::before {
+  background: linear-gradient(90deg, transparent, var(--champagne), transparent);
+  content: '';
+  height: 1px;
+  left: 12%;
+  opacity: 0.55;
+  position: absolute;
+  right: 12%;
+  top: 0;
 }
 
 .nav-wrap {
@@ -129,13 +147,15 @@ h3 {
 
 .brand-mark {
   align-items: center;
-  background: var(--peach);
+  background: linear-gradient(145deg, #f4d6bd, #eec09e);
+  border: 1px solid rgba(201, 165, 109, 0.34);
   border-radius: 50%;
   color: var(--sage-dark);
   display: inline-flex;
   font-size: 1.3rem;
   height: 45px;
   justify-content: center;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.7);
   width: 45px;
 }
 
@@ -172,7 +192,7 @@ h3 {
 .nav-link:hover,
 .nav-link:focus-visible,
 .nav-link.active {
-  background: var(--sand);
+  background: var(--linen);
   color: var(--sage-dark);
 }
 
@@ -193,8 +213,9 @@ h3 {
 
 .hero {
   background:
-    radial-gradient(circle at 8% 28%, rgba(242, 197, 166, 0.2), transparent 36%),
-    linear-gradient(122deg, #fff7ee 0%, #fffdf8 52%, #f4ecdf 100%);
+    radial-gradient(circle at 8% 28%, rgba(242, 197, 166, 0.24), transparent 36%),
+    radial-gradient(circle at 92% 12%, rgba(201, 165, 109, 0.15), transparent 28%),
+    linear-gradient(122deg, #fff7ee 0%, #fffdf8 52%, #f2e9db 100%);
   overflow: hidden;
   padding: 42px 0 74px;
   position: relative;
@@ -226,7 +247,7 @@ h3 {
 
 .eyebrow {
   align-items: center;
-  color: var(--terracotta);
+  color: #ae694c;
   display: flex;
   font-size: 0.79rem;
   font-weight: 700;
@@ -237,7 +258,7 @@ h3 {
 }
 
 .eyebrow::before {
-  background: var(--peach);
+  background: linear-gradient(90deg, var(--champagne), var(--peach));
   border-radius: 99px;
   content: '';
   display: inline-block;
@@ -262,7 +283,7 @@ h3 {
 
 .button {
   align-items: center;
-  background: var(--terracotta);
+  background: linear-gradient(135deg, #cf7c5c, #b95f43);
   border: 0;
   border-radius: 999px;
   color: var(--white);
@@ -275,18 +296,21 @@ h3 {
   justify-content: center;
   min-height: 53px;
   padding: 12px 25px;
-  transition: transform 150ms ease, background 150ms ease;
+  box-shadow: 0 12px 24px rgba(164, 83, 57, 0.2);
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
 }
 
 .button:hover,
 .button:focus-visible {
-  background: #b76346;
+  background: linear-gradient(135deg, #c06d4f, #a9533b);
+  box-shadow: 0 16px 31px rgba(164, 83, 57, 0.28);
   transform: translateY(-2px);
 }
 
 .button-secondary {
-  background: var(--white);
-  border: 1px solid var(--border);
+  background: rgba(255, 253, 249, 0.92);
+  border: 1px solid var(--champagne-soft);
+  box-shadow: none;
   color: var(--sage-dark);
 }
 
@@ -337,7 +361,7 @@ h3 {
 }
 
 .hero-photo-wrap::before {
-  border: 1px solid rgba(202, 120, 88, 0.22);
+  border: 1px solid rgba(201, 165, 109, 0.46);
   border-radius: 42px;
   content: '';
   inset: 0;
@@ -347,7 +371,7 @@ h3 {
 .hero-photo {
   aspect-ratio: 1400 / 768;
   border-radius: 36px;
-  box-shadow: var(--shadow-deep);
+  box-shadow: var(--shadow-luxe);
   height: auto;
   object-fit: cover;
   object-position: center;
@@ -361,7 +385,8 @@ h3 {
 .home-page .hero-photo-wrap::after {
   background: var(--white);
   border-radius: 999px;
-  box-shadow: 0 13px 30px rgba(54, 50, 36, 0.12);
+  border: 1px solid rgba(201, 165, 109, 0.25);
+  box-shadow: 0 15px 34px rgba(54, 50, 36, 0.14);
   color: var(--sage-dark);
   content: 'Loving care at home';
   font-size: 0.8rem;
@@ -396,7 +421,9 @@ h3 {
 }
 
 .promise-band {
-  background: linear-gradient(112deg, #1f4037, #294c42 55%, #203d35);
+  background:
+    linear-gradient(90deg, rgba(201, 165, 109, 0.2), transparent 25%, transparent 75%, rgba(201, 165, 109, 0.2)),
+    linear-gradient(112deg, #16342c, #27483f 55%, #17362e);
   color: var(--white);
 }
 
@@ -406,7 +433,7 @@ h3 {
 }
 
 .promise {
-  border-right: 1px solid rgba(255, 255, 255, 0.16);
+  border-right: 1px solid rgba(234, 219, 195, 0.2);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -426,6 +453,7 @@ h3 {
   color: var(--white);
   font-family: var(--font-display);
   font-size: 1.3rem;
+  letter-spacing: -0.02em;
 }
 
 .promise span {
@@ -439,7 +467,7 @@ h3 {
 
 .section-soft {
   background:
-    linear-gradient(rgba(245, 234, 219, 0.84), rgba(245, 234, 219, 0.92)),
+    linear-gradient(rgba(248, 239, 226, 0.83), rgba(247, 237, 223, 0.94)),
     url('/assets/brand-paper-v1.jpg') center top / cover no-repeat;
   border-bottom: 1px solid rgba(232, 218, 203, 0.48);
   border-top: 1px solid rgba(232, 218, 203, 0.48);
@@ -456,6 +484,10 @@ h3 {
   margin-bottom: 0;
 }
 
+.section-heading .eyebrow {
+  justify-content: center;
+}
+
 .cards-grid {
   display: grid;
   gap: 18px;
@@ -468,7 +500,7 @@ h3 {
 .product-card,
 .pet-card {
   background: var(--white);
-  border: 1px solid rgba(232, 218, 203, 0.8);
+  border: 1px solid rgba(201, 165, 109, 0.2);
   border-radius: var(--radius);
   padding: 27px;
 }
@@ -477,11 +509,12 @@ h3 {
   min-height: 205px;
   overflow: hidden;
   position: relative;
-  transition: box-shadow 180ms ease, transform 180ms ease;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.8);
+  transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
 }
 
 .service-card::before {
-  background: linear-gradient(90deg, var(--peach), transparent);
+  background: linear-gradient(90deg, var(--champagne), var(--peach), transparent);
   content: '';
   height: 3px;
   left: 27px;
@@ -493,7 +526,8 @@ h3 {
 }
 
 .service-card:hover {
-  box-shadow: var(--shadow);
+  border-color: rgba(201, 165, 109, 0.37);
+  box-shadow: var(--shadow-luxe);
   transform: translateY(-4px);
 }
 
@@ -512,7 +546,8 @@ h3 {
 .service-card .icon,
 .trust-card .icon {
   align-items: center;
-  background: #f9eee4;
+  background: linear-gradient(145deg, #fbf1e8, #f5e5d7);
+  border: 1px solid rgba(201, 165, 109, 0.2);
   border-radius: 14px;
   color: var(--terracotta);
   display: inline-flex;
@@ -539,7 +574,9 @@ h3 {
 }
 
 .story-section {
-  background: var(--white);
+  background:
+    radial-gradient(circle at 80% 30%, rgba(201, 165, 109, 0.1), transparent 27rem),
+    var(--white);
 }
 
 .story-grid {
@@ -584,10 +621,10 @@ h3 {
 }
 
 .visit-steps {
-  background: linear-gradient(145deg, #fffaf3, #f7eddf);
-  border: 1px solid var(--border);
+  background: linear-gradient(145deg, #fffdf8, #f7ecdc);
+  border: 1px solid rgba(201, 165, 109, 0.27);
   border-radius: 30px;
-  box-shadow: 0 18px 45px rgba(72, 55, 41, 0.06);
+  box-shadow: var(--shadow);
   display: grid;
   gap: 0;
   padding: 14px 30px;
@@ -608,7 +645,8 @@ h3 {
 
 .visit-step span {
   align-items: center;
-  background: #f5e5d9;
+  background: #f4e7d4;
+  border: 1px solid rgba(201, 165, 109, 0.35);
   border-radius: 50%;
   color: var(--terracotta);
   display: flex;
@@ -634,14 +672,20 @@ h3 {
 }
 
 .trust-card {
+  box-shadow: 0 12px 30px rgba(72, 55, 41, 0.045);
   text-align: center;
+}
+
+.trust-section {
+  background: linear-gradient(180deg, #fffdf9, #fff9f1);
 }
 
 .cta-banner {
   align-items: center;
   background:
     radial-gradient(circle at 88% 15%, rgba(242, 197, 166, 0.2), transparent 35%),
-    linear-gradient(120deg, #38584c, var(--sage-dark) 48%, #29473d);
+    linear-gradient(120deg, #23443a, #17362e 48%, #27483d);
+  border: 1px solid rgba(201, 165, 109, 0.24);
   border-radius: 30px;
   box-shadow: 0 20px 52px rgba(30, 50, 43, 0.17);
   color: var(--white);
@@ -680,13 +724,17 @@ h3 {
 }
 
 .page-hero {
+  background:
+    radial-gradient(circle at 50% -30%, rgba(201, 165, 109, 0.15), transparent 27rem),
+    linear-gradient(180deg, #fffaf3, #fffdf9);
+  border-bottom: 1px solid rgba(201, 165, 109, 0.12);
   padding: 58px 0 50px;
   text-align: center;
 }
 
 .gallery-page .page-hero {
   background:
-    linear-gradient(rgba(255, 250, 243, 0.76), rgba(255, 250, 243, 0.88)),
+    linear-gradient(rgba(255, 250, 243, 0.68), rgba(255, 250, 243, 0.9)),
     url('/assets/brand-paper-v1.jpg') center / cover no-repeat;
   border-bottom: 1px solid rgba(232, 218, 203, 0.6);
   position: relative;
@@ -748,12 +796,13 @@ h3 {
   display: grid;
   gap: clamp(22px, 3vw, 34px);
   grid-template-columns: minmax(255px, 0.7fr) minmax(530px, 1.35fr);
-  padding-bottom: 78px;
+  padding-bottom: 86px;
+  padding-top: 8px;
 }
 
 .panel {
-  background: var(--white);
-  border: 1px solid var(--border);
+  background: rgba(255, 254, 251, 0.98);
+  border: 1px solid rgba(201, 165, 109, 0.25);
   border-radius: var(--radius);
   box-shadow: 0 3px 12px rgba(72, 55, 41, 0.035);
   padding: 29px;
@@ -816,12 +865,24 @@ h3 {
 }
 
 .booking-flow {
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-luxe);
+  overflow: hidden;
   padding: clamp(22px, 4vw, 36px);
+  position: relative;
+}
+
+.booking-flow::before {
+  background: linear-gradient(90deg, transparent, var(--champagne), transparent);
+  content: '';
+  height: 2px;
+  left: 22px;
+  position: absolute;
+  right: 22px;
+  top: 0;
 }
 
 .booking-progress {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(201, 165, 109, 0.2);
   margin-bottom: 30px;
   padding-bottom: 23px;
 }
@@ -844,6 +905,14 @@ h3 {
   padding: 0;
 }
 
+.booking-progress.house-only ol {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.booking-progress li[hidden] {
+  display: none;
+}
+
 .booking-progress li {
   align-items: center;
   color: #9b968e;
@@ -854,7 +923,7 @@ h3 {
 
 .booking-progress li span {
   align-items: center;
-  background: #f1ece5;
+  background: #f5ede1;
   border-radius: 50%;
   display: inline-flex;
   font-size: 0.78rem;
@@ -869,19 +938,20 @@ h3 {
 }
 
 .booking-progress li.active span {
-  background: var(--sage-dark);
+  background: var(--evergreen);
+  box-shadow: 0 5px 12px rgba(23, 53, 45, 0.2);
   color: var(--white);
 }
 
 .progress-track {
-  background: #f1ece5;
+  background: #f2e9dc;
   border-radius: 999px;
   height: 5px;
   overflow: hidden;
 }
 
 .progress-track span {
-  background: var(--terracotta);
+  background: linear-gradient(90deg, var(--champagne), var(--terracotta));
   border-radius: inherit;
   display: block;
   height: 100%;
@@ -949,8 +1019,8 @@ h3 {
 }
 
 .calendar-control {
-  background: var(--sand);
-  border: 0;
+  background: #f7ede0;
+  border: 1px solid rgba(201, 165, 109, 0.2);
   border-radius: 50%;
   color: var(--sage-dark);
   cursor: pointer;
@@ -998,7 +1068,7 @@ h3 {
 }
 
 .calendar-days button.selected {
-  background: var(--terracotta);
+  background: linear-gradient(135deg, #cf7c5c, #ae583f);
   color: var(--white);
   font-weight: 700;
 }
@@ -1013,7 +1083,8 @@ h3 {
 }
 
 .selected-summary {
-  background: #f8f3eb;
+  background: var(--linen);
+  border: 1px solid rgba(201, 165, 109, 0.2);
   border-radius: 14px;
   color: var(--ink-light);
   font-size: 0.91rem;
@@ -1082,7 +1153,7 @@ h3 {
 .choice-cards span {
   align-items: center;
   background: #fffdf9;
-  border: 1px solid var(--border);
+  border: 1px solid var(--champagne-soft);
   border-radius: 12px;
   display: flex;
   justify-content: center;
@@ -1091,8 +1162,8 @@ h3 {
 }
 
 .choice-cards input:checked + span {
-  background: #eaf1eb;
-  border-color: var(--sage);
+  background: #ecf2ec;
+  border-color: var(--sage-dark);
   color: var(--sage-dark);
 }
 
@@ -1116,7 +1187,7 @@ input,
 select,
 textarea {
   background: #fffdf9;
-  border: 1px solid var(--border);
+  border: 1px solid var(--champagne-soft);
   border-radius: 11px;
   color: var(--ink);
   font: inherit;
@@ -1165,7 +1236,8 @@ textarea {
 }
 
 .privacy-note {
-  background: #f8f3eb;
+  background: var(--linen);
+  border: 1px solid rgba(201, 165, 109, 0.16);
   border-radius: 15px;
   color: var(--ink-light);
   font-size: 0.9rem;
@@ -1180,7 +1252,8 @@ textarea {
 }
 
 .request-review {
-  background: #f8f3eb;
+  background: linear-gradient(145deg, #fcf7ee, #f8f0e5);
+  border: 1px solid rgba(201, 165, 109, 0.2);
   border-radius: 18px;
   margin-top: 28px;
   padding: 19px;
@@ -1303,16 +1376,36 @@ textarea {
 }
 
 .gallery-grid {
+  counter-reset: moment;
   display: grid;
   gap: 22px;
   grid-template-columns: repeat(3, 1fr);
 }
 
 .pet-card {
+  counter-increment: moment;
   content-visibility: auto;
   overflow: hidden;
   padding: 12px 12px 22px;
-  transition: box-shadow 220ms ease, transform 220ms ease;
+  box-shadow: 0 8px 25px rgba(72, 55, 41, 0.035);
+  position: relative;
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease;
+}
+
+.gallery-page .pet-card::before {
+  background: rgba(255, 253, 249, 0.93);
+  border: 1px solid rgba(201, 165, 109, 0.25);
+  border-radius: 999px;
+  color: var(--champagne);
+  content: counter(moment, decimal-leading-zero);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 5px 9px;
+  position: absolute;
+  right: 23px;
+  top: 23px;
+  z-index: 1;
 }
 
 .pet-photo {
@@ -1326,6 +1419,7 @@ textarea {
 }
 
 .gallery-page .pet-card:hover {
+  border-color: rgba(201, 165, 109, 0.38);
   box-shadow: var(--shadow-deep);
   transform: translateY(-5px) rotate(-0.2deg);
 }

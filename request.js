@@ -14,6 +14,12 @@ const progressFill = document.querySelector('#progress-fill');
 const stepAnnouncement = document.querySelector('#step-announcement');
 const steps = [...document.querySelectorAll('.booking-step')];
 const indicators = [...document.querySelectorAll('[data-step-indicator]')];
+const serviceTypeInput = document.querySelector('#serviceType');
+const petStepIndicator = document.querySelector('[data-pet-step-indicator]');
+const contactStepNumber = document.querySelector('[data-step-indicator="3"] span');
+const continueFromService = document.querySelector('#continue-from-service');
+const progressPanel = document.querySelector('.booking-progress');
+const petFieldNames = ['petNames', 'petTypes', 'petCount', 'initialNeeds'];
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -39,6 +45,32 @@ function readableDate(dateKey) {
 
 function fieldValue(name) {
   return form.elements[name]?.value.trim() || '';
+}
+
+function skipsPetStep() {
+  return fieldValue('serviceType') === 'Home Sitting';
+}
+
+function activeSteps() {
+  return skipsPetStep() ? [1, 3] : [1, 2, 3];
+}
+
+function syncServicePath(clearSkippedValues = false) {
+  const houseOnly = skipsPetStep();
+  if (houseOnly && clearSkippedValues) {
+    petFieldNames.forEach((name) => {
+      form.elements[name].value = '';
+    });
+  }
+  petFieldNames.forEach((name) => {
+    form.elements[name].disabled = houseOnly;
+  });
+  petStepIndicator.hidden = houseOnly;
+  contactStepNumber.textContent = houseOnly ? '2' : '3';
+  progressPanel.classList.toggle('house-only', houseOnly);
+  continueFromService.innerHTML = houseOnly
+    ? 'Continue to Contact <span aria-hidden="true">&rarr;</span>'
+    : 'Continue to Pets <span aria-hidden="true">&rarr;</span>';
 }
 
 function updateReview() {
@@ -122,6 +154,9 @@ function showError(message) {
 }
 
 function setStep(step, shouldFocus = true) {
+  const sequence = activeSteps();
+  const position = sequence.indexOf(step);
+  if (position === -1) step = sequence[0];
   currentStep = step;
   steps.forEach((panel) => {
     const active = Number(panel.dataset.step) === step;
@@ -134,8 +169,10 @@ function setStep(step, shouldFocus = true) {
     if (active) indicator.setAttribute('aria-current', 'step');
     else indicator.removeAttribute('aria-current');
   });
-  stepCount.textContent = `Step ${step} of 3`;
-  progressFill.style.width = `${(step / 3) * 100}%`;
+  const visiblePosition = activeSteps().indexOf(step) + 1;
+  const count = activeSteps().length;
+  stepCount.textContent = `Step ${visiblePosition} of ${count}`;
+  progressFill.style.width = `${(visiblePosition / count) * 100}%`;
   stepAnnouncement.textContent = `${stepCount.textContent}: ${steps[step - 1].querySelector('h2').textContent}`;
   clearStatus();
   updateReview();
@@ -178,16 +215,26 @@ document.querySelector('#next-month').addEventListener('click', () => {
 
 form.querySelectorAll('[data-next-step]').forEach((button) => {
   button.addEventListener('click', () => {
-    if (validateStep(currentStep)) setStep(currentStep + 1);
+    const sequence = activeSteps();
+    const nextStep = sequence[sequence.indexOf(currentStep) + 1];
+    if (validateStep(currentStep) && nextStep) setStep(nextStep);
   });
 });
 
 form.querySelectorAll('[data-previous-step]').forEach((button) => {
-  button.addEventListener('click', () => setStep(currentStep - 1));
+  button.addEventListener('click', () => {
+    const sequence = activeSteps();
+    const previousStep = sequence[sequence.indexOf(currentStep) - 1];
+    if (previousStep) setStep(previousStep);
+  });
 });
 
 form.addEventListener('input', updateReview);
 form.addEventListener('change', updateReview);
+serviceTypeInput.addEventListener('change', () => {
+  syncServicePath(true);
+  updateReview();
+});
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -231,9 +278,11 @@ document.querySelector('#new-request').addEventListener('click', () => {
   updateSelectedDates();
   successPanel.hidden = true;
   form.hidden = false;
+  syncServicePath();
   setStep(1);
 });
 
 renderCalendar();
 updateSelectedDates();
+syncServicePath();
 setStep(1, false);

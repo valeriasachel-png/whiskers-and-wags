@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Request pet sitting or home sitting from Whiskers & Wags in Madison and nearby Jackson metro communities. Select dates and tell us about your pets.">
+    <meta name="description" content="Request pet sitting or home sitting from Whiskers & Wags in Madison and nearby Jackson metro communities. Select dates and the care you need.">
     <meta name="robots" content="index,follow,max-image-preview:large">
-    <title>Request Pet Sitting in Madison, MS | Whiskers &amp; Wags</title>
+    <title>Request Pet or Home Sitting in Madison, MS | Whiskers &amp; Wags</title>
     <link rel="canonical" href="https://whiskersandwagsms.com/request">
-    <meta property="og:title" content="Request Pet Sitting in Madison, MS | Whiskers &amp; Wags">
+    <meta property="og:title" content="Request Pet or Home Sitting in Madison, MS | Whiskers &amp; Wags">
     <meta property="og:description" content="Select your dates and request loving in-home pet or home sitting care in the Jackson metro area.">
     <meta property="og:url" content="https://whiskersandwagsms.com/request">
     <meta property="og:type" content="website">
@@ -15,9 +15,9 @@
     <meta property="og:image" content="https://whiskersandwagsms.com/assets/hero-pets-mobile-v2.jpg">
     <meta property="og:image:alt" content="A golden retriever and tabby cat sitting together on a welcoming front porch">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/styles.css?v=20260525-7">
-    <script src="/shared.js?v=20260525-6" defer></script>
-    <script src="/request.js?v=20260525-4" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260525-8">
+    <script src="/shared.js?v=20260525-7" defer></script>
+    <script src="/request.js?v=20260525-5" defer></script>
   </head>
   <body class="request-page">
     <div data-site-header></div>
@@ -25,8 +25,8 @@
       <section class="page-hero">
         <div class="container">
           <div class="eyebrow">Start With A Simple Request</div>
-          <h1>Request Pet Sitting</h1>
-          <p>Share your dates and pet basics in just a few steps. We will personally follow up to confirm availability.</p>
+          <h1>Request Care</h1>
+          <p>Share your dates and the care you need in a few simple steps. We will personally follow up to confirm availability.</p>
         </div>
       </section>
       <div class="container booking-layout">
@@ -35,7 +35,7 @@
           <h2>First, let&apos;s see if your dates fit.</h2>
           <p>We only ask for the essentials now. Once availability is confirmed, we will gather detailed routines and home-care information privately.</p>
           <div class="assurance-list">
-            <div><span aria-hidden="true">1</span><p><strong>Send a request</strong>Choose your dates and tell us who needs care.</p></div>
+            <div><span aria-hidden="true">1</span><p><strong>Send a request</strong>Choose your dates and the care you need.</p></div>
             <div><span aria-hidden="true">2</span><p><strong>Personal follow-up</strong>We reply by your preferred method to confirm availability.</p></div>
             <div><span aria-hidden="true">3</span><p><strong>Care details later</strong>Access instructions, emergency contacts, and medical routines stay private until needed.</p></div>
           </div>
@@ -46,7 +46,7 @@
             <p class="step-count" id="step-count">Step 1 of 3</p>
             <ol>
               <li class="active" data-step-indicator="1" aria-current="step"><span>1</span><strong>Dates</strong></li>
-              <li data-step-indicator="2"><span>2</span><strong>Pets</strong></li>
+              <li data-step-indicator="2" data-pet-step-indicator><span>2</span><strong>Pets</strong></li>
               <li data-step-indicator="3"><span>3</span><strong>Contact</strong></li>
             </ol>
             <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
@@ -106,7 +106,7 @@
               </div>
             </div>
             <div class="step-actions step-actions-next">
-              <button class="button" type="button" data-next-step>Continue to Pets <span aria-hidden="true">&rarr;</span></button>
+              <button class="button" id="continue-from-service" type="button" data-next-step>Continue to Pets <span aria-hidden="true">&rarr;</span></button>
             </div>
           </section>
 

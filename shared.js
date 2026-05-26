@@ -10,7 +10,7 @@ const business = {
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/request', label: 'Request Pet Sitting' },
+  { href: '/request', label: 'Request Care' },
   { href: '/gallery', label: 'Gallery & Testimonials' },
   { href: '/picks', label: 'Pet Care Picks' },
 ];
