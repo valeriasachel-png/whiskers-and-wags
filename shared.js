@@ -11,7 +11,7 @@ const business = {
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/request', label: 'Request Care' },
-  { href: '/gallery', label: 'Gallery & Testimonials' },
+  { href: '/gallery', label: 'Gallery & Client Notes' },
   { href: '/picks', label: 'Pet Care Picks' },
 ];
 
@@ -135,9 +135,9 @@ const revealSelectors = {
   ],
   '/gallery': [
     '.page-hero .container > *',
-    '.section-heading',
-    '.pet-card',
-    '.testimonial',
+    '.gallery-showcase',
+    '.notes-intro',
+    '.notes-card',
     '.cta-banner',
   ],
 };

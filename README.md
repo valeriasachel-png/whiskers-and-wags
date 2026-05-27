@@ -4,7 +4,7 @@ A responsive multi-page website for a pet sitting and home sitting business. It 
 
 - Welcoming home page with services and calls to action
 - Accessible three-step request flow with multi-date calendar selection and essential-first intake
-- Photo gallery with testimonials ready for approved client quotes
+- Swipeable photo journal with all gallery photos and a client-notes area ready for approved quotes
 - Exact Amazon product recommendations with active Associates tracking disclosure
 - Server-side form delivery through a Cloudflare Pages Function and Resend
 - Basic bot-trap protection for request submissions
@@ -49,7 +49,7 @@ For deployment, configure the same values in Cloudflare Pages. Save `RESEND_API_
 - Live destination email and sender configuration: Cloudflare Pages **Settings > Variables and Secrets**
 - Local-only email testing configuration: `.env`
 - Hero and story photos shown on the home page: `index.html` and `assets/gallery/`
-- Gallery photos and approved testimonials: `gallery.html`
+- Gallery photos and approved client notes: `gallery.html`; viewer and swipe behavior: `gallery.js`
 - Product recommendations and Amazon tracking ID: `picks.js`
 
 Publish client photos and quotes only when you have permission to use them.
@@ -77,7 +77,7 @@ Do not announce or submit the website to Amazon Associates until these are compl
 
 - Confirm the public email, both displayed phone numbers, and service areas in `shared.js`.
 - Configure booking email delivery and send a successful test request.
-- Keep the gallery and testimonials as coming-soon placeholders until you have client permission.
+- Publish client notes only after receiving permission from the client.
 - Purchased domain: `whiskersandwagsms.com` (registered through Cloudflare on May 24, 2026).
 - Connect `whiskersandwagsms.com` to the Cloudflare Pages project after its first successful deploy.
 - Review your local business requirements, insurance, scheduling policies, and privacy handling for customer addresses and pet-care details.
