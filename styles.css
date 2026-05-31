@@ -1487,9 +1487,9 @@ textarea {
 
 .gallery-page section[aria-labelledby='reviews-title'] {
   background:
-    radial-gradient(circle at 10% 0%, rgba(245, 200, 210, 0.3), transparent 28rem),
-    radial-gradient(circle at 90% 15%, rgba(111, 146, 118, 0.22), transparent 25rem),
-    linear-gradient(rgba(255, 250, 252, 0.9), rgba(255, 253, 249, 0.97)),
+    radial-gradient(circle at 9% 8%, rgba(232, 154, 172, 0.34), transparent 23rem),
+    radial-gradient(circle at 92% 16%, rgba(58, 101, 72, 0.28), transparent 24rem),
+    linear-gradient(135deg, rgba(255, 238, 243, 0.92), rgba(236, 246, 237, 0.93)),
     url('/assets/brand-paper-v1.jpg') center / cover no-repeat;
 }
 
@@ -1498,17 +1498,38 @@ textarea {
 }
 
 .gallery-collection {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(245, 200, 210, 0.4), transparent 23rem),
+    radial-gradient(circle at 82% 35%, rgba(63, 104, 76, 0.2), transparent 25rem),
+    linear-gradient(180deg, #fff8fa 0%, #f4fbf4 100%);
   padding-bottom: clamp(48px, 6vw, 64px);
   padding-top: clamp(25px, 4vw, 42px);
+  position: relative;
+}
+
+.gallery-collection::before {
+  background:
+    linear-gradient(135deg, transparent 0 46%, rgba(63, 104, 76, 0.12) 46% 48%, transparent 48%),
+    radial-gradient(ellipse at center, rgba(63, 104, 76, 0.22) 0 35%, transparent 37%);
+  border-radius: 999px 999px 999px 0;
+  content: '';
+  height: 180px;
+  left: max(18px, calc((100vw - 1180px) / 2));
+  opacity: 0.75;
+  pointer-events: none;
+  position: absolute;
+  top: 32px;
+  transform: rotate(20deg);
+  width: 82px;
 }
 
 .gallery-showcase {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 240, 244, 0.62)),
-    #fffdf9;
-  border: 1px solid rgba(234, 167, 182, 0.42);
+    linear-gradient(135deg, rgba(255, 244, 247, 0.96), rgba(242, 250, 242, 0.92)),
+    #fff8fa;
+  border: 1px solid rgba(63, 104, 76, 0.18);
   border-radius: 34px;
-  box-shadow: 0 35px 90px rgba(63, 46, 33, 0.12), 0 18px 50px rgba(111, 146, 118, 0.1);
+  box-shadow: 0 35px 90px rgba(63, 46, 33, 0.12), 0 18px 50px rgba(63, 104, 76, 0.18);
   overflow: hidden;
   padding: clamp(12px, 2vw, 18px);
   position: relative;
@@ -1543,6 +1564,7 @@ textarea {
 .gallery-feature {
   background: linear-gradient(135deg, #f2e7df, var(--blush-soft));
   border: 0;
+  border: 1px solid rgba(255, 253, 249, 0.7);
   border-radius: 22px;
   cursor: zoom-in;
   display: block;
@@ -1597,6 +1619,11 @@ textarea {
 
 .gallery-stage-copy {
   align-content: center;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(245, 200, 210, 0.35), transparent 9rem),
+    linear-gradient(145deg, rgba(255, 250, 252, 0.72), rgba(236, 246, 237, 0.72));
+  border: 1px solid rgba(245, 200, 210, 0.34);
+  border-radius: 22px;
   display: grid;
   padding: clamp(10px, 3vw, 30px) clamp(8px, 1.5vw, 16px);
 }
@@ -1700,9 +1727,9 @@ textarea {
 
 .client-notes {
   background:
-    radial-gradient(circle at 15% 20%, rgba(245, 200, 210, 0.34), transparent 25rem),
-    radial-gradient(circle at 88% 70%, rgba(111, 146, 118, 0.25), transparent 24rem),
-    linear-gradient(180deg, #fffafc 0%, #fffdf9 100%);
+    radial-gradient(circle at 14% 18%, rgba(232, 154, 172, 0.42), transparent 24rem),
+    radial-gradient(circle at 88% 58%, rgba(63, 104, 76, 0.3), transparent 26rem),
+    linear-gradient(160deg, #fff0f4 0%, #eef8ef 58%, #fffaf3 100%);
   padding-bottom: clamp(54px, 8vw, 84px);
   padding-top: clamp(54px, 8vw, 84px);
   position: relative;
@@ -1748,8 +1775,8 @@ textarea {
 }
 
 .notes-promise span {
-  background: rgba(255, 255, 255, 0.68);
-  border: 1px solid rgba(111, 146, 118, 0.2);
+  background: rgba(239, 248, 239, 0.86);
+  border: 1px solid rgba(63, 104, 76, 0.24);
   border-radius: 999px;
   color: var(--moss);
   font-size: 0.78rem;
@@ -1759,9 +1786,9 @@ textarea {
 
 .notes-card {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 240, 244, 0.92)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 232, 238, 0.94)),
     url('/assets/brand-paper-v1.jpg') center / cover;
-  border: 1px solid rgba(234, 167, 182, 0.38);
+  border: 1px solid rgba(232, 154, 172, 0.5);
   border-radius: 29px;
   box-shadow: 0 22px 55px rgba(63, 46, 33, 0.09);
   padding: clamp(26px, 4vw, 38px);
@@ -1834,9 +1861,10 @@ textarea {
 
 .review-form {
   background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(255, 240, 244, 0.87)),
+    radial-gradient(circle at 92% 8%, rgba(63, 104, 76, 0.12), transparent 10rem),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.97), rgba(255, 235, 240, 0.92)),
     var(--white);
-  border: 1px solid rgba(234, 167, 182, 0.46);
+  border: 1px solid rgba(232, 154, 172, 0.56);
   border-radius: 30px;
   box-shadow: 0 28px 70px rgba(63, 46, 33, 0.12), 0 12px 36px rgba(111, 146, 118, 0.12);
   display: grid;
@@ -1952,6 +1980,11 @@ textarea {
 .review-form button:disabled {
   cursor: wait;
   opacity: 0.72;
+}
+
+.gallery-page .client-notes .reveal {
+  opacity: 1;
+  transform: none;
 }
 
 .viewer-open {
@@ -2584,6 +2617,9 @@ textarea {
   }
 
   .gallery-showcase {
+    background:
+      linear-gradient(160deg, rgba(255, 238, 243, 0.98), rgba(236, 246, 237, 0.96)),
+      #fff8fa;
     border-radius: 23px;
     padding: 9px;
   }
@@ -2603,6 +2639,9 @@ textarea {
   }
 
   .gallery-stage-copy {
+    background: linear-gradient(145deg, rgba(255, 240, 244, 0.94), rgba(239, 248, 239, 0.88));
+    border-radius: 17px;
+    margin-top: 9px;
     padding: 22px 13px 10px;
   }
 
@@ -2637,6 +2676,10 @@ textarea {
   }
 
   .client-notes {
+    background:
+      radial-gradient(circle at 18% 9%, rgba(232, 154, 172, 0.46), transparent 16rem),
+      radial-gradient(circle at 96% 44%, rgba(63, 104, 76, 0.28), transparent 18rem),
+      linear-gradient(170deg, #fff0f4 0%, #eff8ef 62%, #fffaf3 100%);
     padding-bottom: 48px;
     padding-top: 47px;
   }
