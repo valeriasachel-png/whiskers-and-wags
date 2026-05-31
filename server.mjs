@@ -118,6 +118,28 @@ function validateRequest(input) {
   return { details };
 }
 
+function validateReview(input) {
+  const details = {
+    rating: Number(input.rating),
+    review: cleanText(input.review, 1400),
+    displayName: cleanText(input.displayName, 100),
+    email: cleanText(input.email, 160),
+    publishPermission: Boolean(input.publishPermission),
+  };
+
+  if (!Number.isInteger(details.rating) || details.rating < 1 || details.rating > 5) {
+    return { error: 'Please choose a rating from 1 to 5 stars.' };
+  }
+  if (!details.review || !details.displayName || !details.email) {
+    return { error: 'Please add your name, email, and review before sending.' };
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(details.email)) {
+    return { error: 'Please enter a valid email address.' };
+  }
+
+  return { details };
+}
+
 function requestAllowed(request) {
   const forwardedAddress = cleanText(request.headers['x-forwarded-for'], 100).split(',')[0].trim();
   const address = forwardedAddress || request.socket.remoteAddress || 'unknown';
@@ -207,6 +229,72 @@ async function submitRequest(request, response) {
   }
 }
 
+async function submitReview(request, response) {
+  let input;
+  try {
+    input = await readJson(request);
+  } catch {
+    return json(response, 400, { message: 'Please submit valid review details.' });
+  }
+  // Simple honeypot: automated submissions often populate this invisible field.
+  if (cleanText(input.website, 100)) return json(response, 201, { message: 'Review sent.' });
+  const validation = validateReview(input);
+  if (validation.error) return json(response, 400, { message: validation.error });
+  if (!requestAllowed(request)) {
+    return json(response, 429, { message: 'Too many notes have been submitted. Please try again a little later.' });
+  }
+
+  // BUSINESS EMAIL: Put the destination address and Resend API key in .env, never client-side code.
+  const destination = process.env.BUSINESS_EMAIL;
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!destination || destination.includes('PUT MY EMAIL HERE') || !apiKey || apiKey.includes('your_api_key')) {
+    return json(response, 503, {
+      message: 'Online review delivery is being set up. Please contact Whiskers and Wags directly for now.',
+    });
+  }
+
+  const labels = {
+    rating: 'Star Rating',
+    displayName: 'Display Name',
+    email: 'Private Email',
+    publishPermission: 'Permission to Feature',
+    review: 'Client Note',
+  };
+  const body = Object.entries(labels)
+    .map(([key, label]) => {
+      const value = key === 'publishPermission'
+        ? (validation.details.publishPermission ? 'Yes, first name and note may be featured after review.' : 'No, keep private for now.')
+        : validation.details[key];
+      return `${label}:\n${value}`;
+    })
+    .join('\n\n');
+
+  try {
+    const emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM || 'Whiskers and Wags <onboarding@resend.dev>',
+        to: [destination],
+        reply_to: validation.details.email,
+        subject: `New ${validation.details.rating}-star client note from ${validation.details.displayName}`,
+        text: body,
+      }),
+    });
+    if (!emailResponse.ok) {
+      console.error('Email provider rejected review:', emailResponse.status, await emailResponse.text());
+      return json(response, 502, { message: 'We could not send your note right now. Please try again shortly.' });
+    }
+    return json(response, 201, { message: 'Review sent.' });
+  } catch (error) {
+    console.error('Email review failed:', error.message);
+    return json(response, 502, { message: 'We could not send your note right now. Please try again shortly.' });
+  }
+}
+
 async function serveStatic(request, response, url) {
   const cleanRouteFiles = {
     '/request': '/request.html',
@@ -254,6 +342,9 @@ const server = createServer(async (request, response) => {
   }
   if (request.method === 'POST' && url.pathname === '/api/requests') {
     return submitRequest(request, response);
+  }
+  if (request.method === 'POST' && url.pathname === '/api/reviews') {
+    return submitReview(request, response);
   }
   if (request.method === 'GET' || request.method === 'HEAD') return serveStatic(request, response, url);
   response.writeHead(405, { Allow: 'GET, HEAD, POST' });

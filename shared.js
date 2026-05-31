@@ -138,6 +138,7 @@ const revealSelectors = {
     '.gallery-showcase',
     '.notes-intro',
     '.notes-card',
+    '.review-form',
     '.cta-banner',
   ],
 };

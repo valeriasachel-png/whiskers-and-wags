@@ -13,6 +13,8 @@ const photoCount = document.querySelector('#gallery-count');
 const carouselPrevious = document.querySelector('#gallery-previous');
 const carouselNext = document.querySelector('#gallery-next');
 const thumbnailButtons = [...document.querySelectorAll('.gallery-thumb')];
+const reviewForm = document.querySelector('#review-form');
+const reviewStatus = document.querySelector('#review-status');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let activePhoto = 0;
@@ -117,5 +119,55 @@ document.addEventListener('keydown', (event) => {
       event.preventDefault();
       closeButton.focus();
     }
+  }
+});
+
+function setReviewStatus(message, type = '') {
+  reviewStatus.textContent = message;
+  reviewStatus.className = `form-status ${type}`.trim();
+}
+
+function reviewValue(form, name) {
+  return String(new FormData(form).get(name) || '').trim();
+}
+
+reviewForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  setReviewStatus('');
+
+  const payload = {
+    rating: Number(reviewValue(reviewForm, 'rating')),
+    review: reviewValue(reviewForm, 'review'),
+    displayName: reviewValue(reviewForm, 'displayName'),
+    email: reviewValue(reviewForm, 'email'),
+    publishPermission: reviewForm.elements.publishPermission.checked,
+    website: reviewValue(reviewForm, 'website'),
+  };
+
+  if (!payload.rating || !payload.review || !payload.displayName || !payload.email) {
+    setReviewStatus('Please add your rating, name, email, and note before sending.', 'error');
+    return;
+  }
+
+  const submitButton = reviewForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = 'Sending...';
+
+  try {
+    const response = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.message || 'We could not send your note right now.');
+
+    reviewForm.reset();
+    setReviewStatus('Thank you. Your client note was sent privately for review.', 'success');
+  } catch (error) {
+    setReviewStatus(error.message || 'We could not send your note right now. Please try again.', 'error');
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Submit Client Note';
   }
 });
