@@ -28,6 +28,23 @@
   --font-body: 'Avenir Next', Avenir, 'Segoe UI', Arial, sans-serif;
 }
 
+/* LUXURY BRAND SYSTEM: edit these variables to adjust the full-site polish. */
+:root {
+  --rosewater: #ffe8ef;
+  --rose: #e995aa;
+  --rose-deep: #c9687e;
+  --leaf: #eaf6ea;
+  --leaf-wash: #f5fbf4;
+  --botanical: #365f45;
+  --botanical-deep: #18392f;
+  --botanical-ink: #122b24;
+  --cream-glass: rgba(255, 252, 247, 0.82);
+  --card-border: rgba(54, 95, 69, 0.16);
+  --rose-border: rgba(233, 149, 170, 0.36);
+  --luxury-shadow: 0 28px 80px rgba(24, 57, 47, 0.13), 0 12px 32px rgba(201, 104, 126, 0.08);
+  --soft-shadow: 0 18px 50px rgba(24, 57, 47, 0.08);
+}
+
 *,
 *::before,
 *::after {
@@ -49,8 +66,8 @@ body {
 }
 
 .reveal {
-  opacity: 0;
-  transform: translateY(22px);
+  opacity: 1;
+  transform: none;
   transition:
     opacity 560ms cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms),
     transform 600ms cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms);
@@ -3054,5 +3071,447 @@ textarea {
   .reveal {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* FULL-SITE LUXURY POLISH: cohesive botanical blush direction across every page. */
+body {
+  background:
+    radial-gradient(circle at 12% 4%, rgba(255, 232, 239, 0.74), transparent 28rem),
+    radial-gradient(circle at 88% 12%, rgba(234, 246, 234, 0.84), transparent 30rem),
+    linear-gradient(180deg, #fff9fb 0%, #f8fcf6 45%, #fffaf3 100%);
+}
+
+body::before {
+  background:
+    linear-gradient(135deg, transparent 0 44%, rgba(54, 95, 69, 0.09) 44% 46%, transparent 46%),
+    radial-gradient(ellipse at center, rgba(233, 149, 170, 0.12) 0 32%, transparent 34%);
+  border-radius: 999px 999px 999px 0;
+  content: '';
+  height: 240px;
+  opacity: 0.8;
+  pointer-events: none;
+  position: fixed;
+  right: -60px;
+  top: 110px;
+  transform: rotate(-28deg);
+  width: 105px;
+  z-index: -1;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--botanical-ink);
+}
+
+.site-header {
+  background: rgba(255, 250, 252, 0.9);
+  border-bottom: 1px solid rgba(54, 95, 69, 0.12);
+  box-shadow: 0 12px 35px rgba(24, 57, 47, 0.06);
+}
+
+.site-header::before {
+  background: linear-gradient(90deg, transparent, var(--rose), var(--botanical), transparent);
+  height: 2px;
+  opacity: 0.85;
+}
+
+.brand-mark {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.88), transparent 32%),
+    linear-gradient(145deg, var(--rosewater), #dfeee0);
+  border-color: rgba(54, 95, 69, 0.2);
+  box-shadow: 0 9px 22px rgba(54, 95, 69, 0.11), inset 0 1px rgba(255, 255, 255, 0.76);
+  color: var(--botanical);
+}
+
+.nav-link {
+  color: rgba(18, 43, 36, 0.72);
+  font-weight: 750;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible,
+.nav-link.active {
+  background: linear-gradient(135deg, rgba(255, 232, 239, 0.74), rgba(234, 246, 234, 0.78));
+  color: var(--botanical-deep);
+}
+
+.menu-toggle {
+  background: linear-gradient(135deg, var(--rosewater), var(--leaf));
+  border: 1px solid rgba(54, 95, 69, 0.12);
+  color: var(--botanical-deep);
+}
+
+.eyebrow {
+  color: var(--rose-deep);
+  font-weight: 850;
+}
+
+.eyebrow::before {
+  background: linear-gradient(90deg, var(--rose), var(--botanical));
+  height: 7px;
+}
+
+.button {
+  background: linear-gradient(135deg, var(--botanical), var(--botanical-deep));
+  box-shadow: 0 15px 32px rgba(24, 57, 47, 0.22), 0 5px 16px rgba(201, 104, 126, 0.13);
+}
+
+.button:hover,
+.button:focus-visible {
+  background: linear-gradient(135deg, #467456, #102d25);
+  box-shadow: 0 18px 38px rgba(24, 57, 47, 0.3), 0 6px 18px rgba(201, 104, 126, 0.16);
+}
+
+.button-secondary {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: var(--rose-border);
+  color: var(--botanical-deep);
+}
+
+.button-secondary:hover,
+.button-secondary:focus-visible {
+  background: var(--rosewater);
+}
+
+.hero {
+  background:
+    radial-gradient(circle at 15% 18%, rgba(255, 232, 239, 0.92), transparent 30rem),
+    radial-gradient(circle at 82% 28%, rgba(54, 95, 69, 0.18), transparent 29rem),
+    linear-gradient(125deg, #fff5f8 0%, #fbfff8 52%, #eef8ed 100%);
+  padding-top: clamp(34px, 5vw, 58px);
+}
+
+.hero::after {
+  background:
+    radial-gradient(circle at 65% 25%, rgba(233, 149, 170, 0.3), transparent 20rem),
+    radial-gradient(circle at 38% 70%, rgba(54, 95, 69, 0.18), transparent 18rem);
+  z-index: 0;
+}
+
+.hero-copy h1,
+.page-hero h1,
+.shop-hero h1 {
+  text-wrap: balance;
+  text-shadow: 0 8px 28px rgba(24, 57, 47, 0.05);
+}
+
+.tagline {
+  color: var(--botanical);
+}
+
+.hero-meta span::before {
+  background: var(--rose);
+  box-shadow: 0 0 0 5px rgba(255, 232, 239, 0.9);
+}
+
+.hero-photo-wrap::before {
+  border-color: rgba(233, 149, 170, 0.42);
+}
+
+.hero-photo {
+  box-shadow: var(--luxury-shadow);
+}
+
+.home-page .hero-photo-wrap::after {
+  background: rgba(255, 252, 247, 0.94);
+  background-image: radial-gradient(circle at 19px 50%, var(--rose-deep) 0 4px, transparent 5px);
+  border-color: var(--rose-border);
+  color: var(--botanical-deep);
+}
+
+.promise-band {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 232, 239, 0.18), transparent 22rem),
+    radial-gradient(circle at 88% 30%, rgba(233, 149, 170, 0.14), transparent 24rem),
+    linear-gradient(112deg, #102d25, #244a39 52%, #14362d);
+}
+
+.section {
+  position: relative;
+}
+
+.section-soft,
+.trust-section,
+.story-section,
+.store-catalog {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 232, 239, 0.54), transparent 24rem),
+    radial-gradient(circle at 90% 18%, rgba(234, 246, 234, 0.82), transparent 28rem),
+    linear-gradient(180deg, rgba(255, 250, 252, 0.96), rgba(246, 252, 245, 0.96));
+  border-color: rgba(54, 95, 69, 0.1);
+}
+
+.section-heading {
+  max-width: 760px;
+}
+
+.section-heading h2 {
+  text-wrap: balance;
+}
+
+.service-card,
+.trust-card,
+.testimonial,
+.product-card,
+.pet-card,
+.panel,
+.visit-steps,
+.category {
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.93), rgba(255, 248, 250, 0.8)),
+    var(--white);
+  border-color: var(--card-border);
+  box-shadow: 0 13px 38px rgba(24, 57, 47, 0.055);
+}
+
+.service-card::before {
+  background: linear-gradient(90deg, var(--rose), var(--botanical), transparent);
+  opacity: 0.55;
+}
+
+.service-card:hover,
+.trust-card:hover,
+.product-card:hover {
+  border-color: rgba(233, 149, 170, 0.42);
+  box-shadow: var(--luxury-shadow);
+}
+
+.service-card .icon,
+.trust-card .icon {
+  background: linear-gradient(145deg, var(--rosewater), var(--leaf));
+  border-color: rgba(54, 95, 69, 0.14);
+  color: var(--botanical);
+}
+
+.check-list li::before,
+.assurance-list span {
+  background: var(--leaf);
+  color: var(--botanical);
+}
+
+.visit-step span {
+  background: var(--rosewater);
+  border-color: var(--rose-border);
+  color: var(--rose-deep);
+}
+
+.cta-banner {
+  background:
+    radial-gradient(circle at 88% 15%, rgba(255, 232, 239, 0.22), transparent 30%),
+    radial-gradient(circle at 8% 80%, rgba(233, 149, 170, 0.12), transparent 28%),
+    linear-gradient(120deg, #102d25, #18392f 48%, #365f45);
+  border-color: rgba(233, 149, 170, 0.22);
+}
+
+.page-hero,
+.shop-hero {
+  background:
+    radial-gradient(circle at 14% 12%, rgba(255, 232, 239, 0.86), transparent 27rem),
+    radial-gradient(circle at 88% 0%, rgba(54, 95, 69, 0.18), transparent 28rem),
+    linear-gradient(180deg, #fff8fb, #fbfff8);
+  border-bottom-color: rgba(54, 95, 69, 0.11);
+}
+
+.request-page .page-hero,
+.shop-hero {
+  text-align: left;
+}
+
+.request-page .page-hero .container,
+.shop-hero-grid {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.56), rgba(255, 232, 239, 0.22));
+  border: 1px solid rgba(54, 95, 69, 0.1);
+  border-radius: 34px;
+  box-shadow: var(--soft-shadow);
+  padding: clamp(26px, 4vw, 42px);
+}
+
+.booking-layout {
+  padding-top: 28px;
+}
+
+.booking-assurance {
+  background:
+    radial-gradient(circle at 85% 18%, rgba(255, 232, 239, 0.7), transparent 12rem),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(234, 246, 234, 0.58));
+  border: 1px solid rgba(54, 95, 69, 0.12);
+  border-radius: 28px;
+  box-shadow: var(--soft-shadow);
+  padding: 26px;
+}
+
+.booking-flow {
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 250, 0.88)),
+    var(--white);
+  border-color: rgba(233, 149, 170, 0.28);
+}
+
+.booking-flow::before {
+  background: linear-gradient(90deg, var(--rose), var(--botanical), var(--rose));
+}
+
+.booking-progress li.active span,
+.calendar-days button.selected,
+.category-filter.active {
+  background: var(--botanical);
+  border-color: var(--botanical);
+  color: var(--white);
+}
+
+.progress-track span {
+  background: linear-gradient(90deg, var(--rose), var(--botanical));
+}
+
+input,
+select,
+textarea {
+  background: rgba(255, 252, 247, 0.92);
+  border-color: rgba(54, 95, 69, 0.18);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--botanical);
+  box-shadow: 0 0 0 4px rgba(54, 95, 69, 0.13);
+}
+
+.selected-summary,
+.request-review,
+.privacy-note,
+.notice {
+  background: linear-gradient(145deg, rgba(255, 232, 239, 0.48), rgba(234, 246, 234, 0.62));
+  border-color: rgba(54, 95, 69, 0.14);
+}
+
+.shop-hero {
+  padding-top: 32px;
+}
+
+.shop-notice .disclosure,
+.disclosure {
+  background: linear-gradient(135deg, var(--leaf), var(--rosewater));
+  border: 1px solid rgba(54, 95, 69, 0.14);
+  color: var(--botanical-deep);
+}
+
+.category {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 232, 239, 0.44), transparent 16rem),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.95), rgba(246, 252, 245, 0.86));
+}
+
+.category-filter {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(54, 95, 69, 0.15);
+}
+
+.product-card {
+  border-radius: 24px;
+}
+
+.product-image {
+  background: linear-gradient(145deg, #ffffff, #fff4f7);
+}
+
+.product-details li {
+  background: var(--leaf);
+  color: var(--botanical);
+}
+
+.amazon-link {
+  box-shadow: 0 9px 18px rgba(237, 188, 61, 0.16);
+}
+
+.site-footer {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255, 232, 239, 0.35), transparent 18rem),
+    linear-gradient(180deg, #f3e8d9, #eadfce);
+  border-top: 1px solid rgba(54, 95, 69, 0.1);
+}
+
+.mobile-actions {
+  background: rgba(255, 250, 252, 0.92);
+  border-top: 1px solid rgba(54, 95, 69, 0.1);
+}
+
+.mobile-actions a:first-child {
+  background: linear-gradient(135deg, var(--rose-deep), #b85c72);
+}
+
+.mobile-actions a:last-child {
+  background: linear-gradient(135deg, var(--botanical), var(--botanical-deep));
+}
+
+@media (max-width: 940px) {
+  .primary-nav {
+    background: rgba(255, 250, 252, 0.98);
+    border-color: rgba(54, 95, 69, 0.12);
+  }
+
+  .request-page .page-hero,
+  .shop-hero {
+    text-align: center;
+  }
+
+  .request-page .page-hero .eyebrow,
+  .shop-hero .eyebrow {
+    justify-content: center;
+  }
+
+  .booking-assurance {
+    position: static;
+  }
+}
+
+@media (max-width: 680px) {
+  h1 {
+    letter-spacing: -0.055em;
+  }
+
+  .hero {
+    background:
+      radial-gradient(circle at 8% 7%, rgba(255, 232, 239, 0.98), transparent 17rem),
+      radial-gradient(circle at 95% 38%, rgba(54, 95, 69, 0.24), transparent 18rem),
+      linear-gradient(180deg, #fff7fa, #f5fbf4);
+  }
+
+  .hero-copy {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0));
+    border-radius: 28px;
+  }
+
+  .promise-band {
+    border-radius: 0 0 28px 28px;
+  }
+
+  .service-card,
+  .trust-card,
+  .panel,
+  .category,
+  .product-card,
+  .review-form,
+  .notes-card {
+    border-radius: 24px;
+  }
+
+  .request-page .page-hero .container,
+  .shop-hero-grid {
+    border-radius: 26px;
+    padding: 24px 18px;
+  }
+
+  .booking-assurance {
+    padding: 22px;
+  }
+
+  .category-filter {
+    box-shadow: 0 8px 18px rgba(24, 57, 47, 0.05);
   }
 }
