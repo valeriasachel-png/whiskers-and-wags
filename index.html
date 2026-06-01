@@ -30,6 +30,7 @@
         "image": "https://whiskersandwagsms.com/assets/hero-pets.jpg",
         "email": "whiskersandwags811@gmail.com",
         "telephone": "+1-601-331-6989",
+        "priceRange": "Custom quotes",
         "contactPoint": [
           {
             "@type": "ContactPoint",
@@ -61,9 +62,49 @@
         }
       }
     </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Do you offer overnight sitting?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Whiskers & Wags reviews overnight and extended care requests individually. Send your dates and care needs through the request form so we can confirm availability."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you give medication?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Medication reminders and special care routines may be supported when clear written instructions are provided. Detailed medical needs are collected privately after availability is confirmed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What areas do you serve?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Whiskers & Wags serves Madison, Flowood, Ridgeland, Gluckstadt, and Northeast Jackson, Mississippi. Nearby requests can be submitted through the Other / Ask Us option."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How far ahead should I book?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Request care as early as possible, especially before holidays, school breaks, and busy travel weekends. All requests are inquiries until Whiskers & Wags personally confirms availability."
+            }
+          }
+        ]
+      }
+    </script>
     <link rel="preload" as="image" href="/assets/hero-pets-mobile-v2.jpg" media="(max-width: 680px)">
-    <link rel="stylesheet" href="/styles.css?v=20260531-2">
-    <script src="/shared.js?v=20260531-2" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260601-1">
+    <script src="/shared.js?v=20260601-1" defer></script>
   </head>
   <body class="home-page">
     <div data-site-header></div>
@@ -83,8 +124,8 @@
               comfortable, routines steady, and your home thoughtfully checked in on.
             </p>
             <div class="hero-actions">
-              <a class="button" href="/request">Request Pet Sitting <span aria-hidden="true">&rarr;</span></a>
-              <a class="button button-secondary" href="/gallery">Meet Happy Pets</a>
+              <a class="button" href="/request" data-track="cta_request_hero">Request Pet Sitting <span aria-hidden="true">&rarr;</span></a>
+              <a class="button button-secondary" href="/gallery" data-track="cta_gallery_hero">Meet Happy Pets</a>
             </div>
             <div class="hero-meta" aria-label="Service details">
               <span>Madison &amp; nearby communities</span>
@@ -187,6 +228,81 @@
         </div>
       </section>
 
+      <section class="section local-seo-section" aria-labelledby="service-area-title">
+        <div class="container">
+          <div class="section-heading">
+            <div class="eyebrow">Local Pet &amp; Home Sitting</div>
+            <h2 id="service-area-title">Trusted care across Madison and the Jackson metro area</h2>
+            <p>Whiskers &amp; Wags is built for families who want calm, thoughtful care close to home.</p>
+          </div>
+          <div class="service-area-grid">
+            <article class="area-card">
+              <span>Madison</span>
+              <h3>Madison pet sitting</h3>
+              <p>In-home pet sitting in Madison, MS for dogs, cats, and familiar routines that help pets feel settled while you travel.</p>
+            </article>
+            <article class="area-card">
+              <span>Flowood</span>
+              <h3>Flowood pet sitting</h3>
+              <p>Friendly pet sitting in Flowood with feeding, fresh water, playtime, walks, and attentive visit notes.</p>
+            </article>
+            <article class="area-card">
+              <span>Ridgeland</span>
+              <h3>Ridgeland pet sitting</h3>
+              <p>Reliable pet sitting in Ridgeland for busy workdays, weekend trips, holidays, and extended travel plans.</p>
+            </article>
+            <article class="area-card">
+              <span>Gluckstadt</span>
+              <h3>Gluckstadt pet sitting</h3>
+              <p>Gentle, organized pet care in Gluckstadt with personal follow-up before any visit is confirmed.</p>
+            </article>
+            <article class="area-card area-card-wide">
+              <span>Northeast Jackson</span>
+              <h3>Northeast Jackson home sitting</h3>
+              <p>Home sitting and check-ins in Northeast Jackson for mail, plants, lights, basic home watch, and calm pet routines when requested.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section sitter-section" aria-labelledby="sitter-title">
+        <div class="container sitter-card">
+          <div class="sitter-photo" aria-hidden="true">
+            <img src="/assets/hero-pets-mobile-v2.jpg" alt="">
+          </div>
+          <div class="sitter-copy">
+            <div class="eyebrow">Meet Your Sitter</div>
+            <h2 id="sitter-title">Warm care from a real local person, not a faceless app.</h2>
+            <p>Whiskers &amp; Wags was created for pet parents who want someone careful, kind, and easy to reach. You get a personal reply, clear expectations, and care that respects the way your home and pets already work.</p>
+            <ul class="check-list">
+              <li>Personal follow-up before confirming availability</li>
+              <li>Detailed routines collected privately after approval</li>
+              <li>Friendly updates so you are not wondering how things are going</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section pricing-section" aria-labelledby="pricing-title">
+        <div class="container pricing-grid">
+          <div>
+            <div class="eyebrow">Simple Pricing Guidance</div>
+            <h2 id="pricing-title">Custom quotes based on pets, visit length, and care needs.</h2>
+            <p>Every home is different. Pricing depends on the number of pets, requested dates, visit length, service area, routines, and whether you need pet sitting, home sitting, or both.</p>
+          </div>
+          <div class="pricing-card">
+            <strong>What affects your quote?</strong>
+            <ul>
+              <li>Number and type of pets</li>
+              <li>Visit length and frequency</li>
+              <li>Walks, playtime, medications, or special care</li>
+              <li>Home sitting check-ins such as mail, plants, and lights</li>
+            </ul>
+            <a class="button button-secondary" href="/request" data-track="cta_quote_pricing">Request a Custom Quote</a>
+          </div>
+        </div>
+      </section>
+
       <section class="section trust-section" aria-labelledby="why-title">
         <div class="container">
           <div class="section-heading">
@@ -214,13 +330,59 @@
         </div>
       </section>
 
+      <section class="section faq-section" aria-labelledby="faq-title">
+        <div class="container faq-layout">
+          <div>
+            <div class="eyebrow">Questions Before You Book</div>
+            <h2 id="faq-title">A few answers before you send a request</h2>
+            <p>These are the questions Google sees too, which helps local families find Whiskers &amp; Wags when they need care.</p>
+          </div>
+          <div class="faq-list">
+            <details>
+              <summary>Do you offer overnight sitting?</summary>
+              <p>Overnight and extended care requests are reviewed individually. Send your dates and care needs so we can confirm what is possible.</p>
+            </details>
+            <details>
+              <summary>Do you give medication?</summary>
+              <p>Medication reminders and special care routines may be supported with clear written instructions. Detailed medical needs are collected privately after availability is confirmed.</p>
+            </details>
+            <details>
+              <summary>What areas do you serve?</summary>
+              <p>Whiskers &amp; Wags serves Madison, Flowood, Ridgeland, Gluckstadt, and Northeast Jackson, Mississippi. Nearby requests can use “Other / Ask Us.”</p>
+            </details>
+            <details>
+              <summary>How far ahead should I book?</summary>
+              <p>Request care as early as possible, especially around holidays, school breaks, and busy travel weekends. Requests are not booked until personally confirmed.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="section review-cta-section" aria-labelledby="review-cta-title">
+        <div class="container review-cta-card">
+          <div>
+            <div class="eyebrow">Happy With Your Visit?</div>
+            <h2 id="review-cta-title">Help local pet families find us.</h2>
+            <p>Once the Google Business Profile is fully approved, this button can point directly to the official Google review form. For now, client notes can still be sent privately through the gallery page.</p>
+          </div>
+          <div class="review-cta-actions">
+            <!-- GOOGLE REVIEW LINK: Replace this href with the direct Google review form URL after Business Profile approval. -->
+            <a class="button" href="https://www.google.com/search?q=Whiskers+%26+Wags+Madison+MS+reviews" target="_blank" rel="noopener" data-track="cta_google_review">Leave us a Google review</a>
+            <a class="button button-secondary" href="/gallery#leave-note" data-track="cta_private_review">Send a Private Client Note</a>
+          </div>
+        </div>
+      </section>
+
       <section class="section">
         <div class="container cta-banner">
           <div>
             <h2>Ready to plan loving care?</h2>
             <p>Share your dates and pet details, and we will confirm availability soon.</p>
           </div>
-          <a class="button" href="/request">Request Pet Sitting</a>
+          <div class="cta-actions-stack">
+            <a class="button" href="/request" data-track="cta_request_footer">Request Pet Sitting</a>
+            <a class="button button-secondary" href="/assets/new-client-checklist.txt" download data-track="download_new_client_checklist">Download New-Client Checklist</a>
+          </div>
         </div>
       </section>
     </main>

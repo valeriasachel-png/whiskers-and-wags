@@ -6,6 +6,8 @@ const business = {
   phones: ['(601) 331-6989', '(917) 763-3412'],
   location: 'Serving Madison, Flowood, Ridgeland, Gluckstadt, and Northeast Jackson',
   slogan: "Love and care when you're not there!",
+  // GOOGLE REVIEW LINK: Replace after the Business Profile review link is available.
+  googleReviewUrl: 'https://www.google.com/search?q=Whiskers+%26+Wags+Madison+MS+reviews',
 };
 
 const navLinks = [
@@ -22,6 +24,7 @@ function currentPath() {
     '/picks.html': '/picks',
     '/privacy.html': '/privacy',
     '/request.html': '/request',
+    '/client-intake.html': '/client-intake',
   };
   if (path === '/index.html') return '/';
   return filePageAliases[path] ?? path;
@@ -51,8 +54,8 @@ function renderHeader() {
 }
 
 function renderFooter() {
-  const phones = business.phones.map((phone) => `<p><a href="tel:${phone.replace(/\D/g, '')}">${phone}</a></p>`).join('');
-  const email = business.email ? `<p>${business.email}</p>` : '';
+  const phones = business.phones.map((phone, index) => `<p><a href="tel:${phone.replace(/\D/g, '')}" data-track="phone_footer_${index + 1}">${phone}</a></p>`).join('');
+  const email = business.email ? `<p><a href="mailto:${business.email}" data-track="email_footer">${business.email}</a></p>` : '';
   return `
     <footer class="site-footer">
       <div class="container footer-grid">
@@ -72,7 +75,7 @@ function renderFooter() {
           <strong>Connect</strong>
           ${phones}
           ${email}
-          <a class="button button-small" href="/request">Request Care</a>
+          <a class="button button-small" href="/request" data-track="cta_request_footer_global">Request Care</a>
         </div>
       </div>
       <div class="footer-bottom">&copy; ${new Date().getFullYear()} ${business.name}. ${business.slogan}</div>
@@ -84,8 +87,8 @@ document.querySelector('[data-site-footer]').innerHTML = renderFooter();
 document.body.insertAdjacentHTML(
   'beforeend',
   `<div class="mobile-actions" aria-label="Quick actions">
-    <a href="/request">Request Care</a>
-    <a href="tel:${business.phones[0].replace(/\D/g, '')}">Call Now</a>
+    <a href="/request" data-track="mobile_request">Request Care</a>
+    <a href="tel:${business.phones[0].replace(/\D/g, '')}" data-track="mobile_call">Call Now</a>
   </div>`,
 );
 
@@ -128,9 +131,14 @@ const revealSelectors = {
     '.promise',
     '.section-heading',
     '.service-card',
+    '.area-card',
+    '.sitter-card',
+    '.pricing-grid',
     '.story-copy',
     '.visit-step',
     '.trust-card',
+    '.faq-layout',
+    '.review-cta-card',
     '.cta-banner',
   ],
   '/gallery': [
@@ -170,3 +178,32 @@ if (revealTargets.length) {
     revealTargets.forEach((element) => revealObserver.observe(element));
   }
 }
+
+// CONVERSION TRACKING: privacy-friendly click events only, with no form details stored in the browser.
+function trackConversion(eventName, target = '') {
+  const payload = JSON.stringify({
+    event: eventName,
+    path: window.location.pathname,
+    target,
+  });
+  const endpoint = '/api/events';
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(endpoint, new Blob([payload], { type: 'application/json' }));
+    return;
+  }
+  fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: payload,
+    keepalive: true,
+  }).catch(() => {});
+}
+
+document.addEventListener('click', (event) => {
+  const tracked = event.target.closest('[data-track], a[href^="tel:"], a[href^="mailto:"]');
+  if (!tracked) return;
+  const eventName =
+    tracked.dataset.track ||
+    (tracked.href?.startsWith('tel:') ? 'phone_click' : tracked.href?.startsWith('mailto:') ? 'email_click' : 'link_click');
+  trackConversion(eventName, tracked.getAttribute('href') || tracked.textContent.trim());
+});

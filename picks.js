@@ -193,7 +193,7 @@ function productCard(product, categoryName) {
   const destination = amazonAffiliateLink(product.amazonUrl);
   return `
     <article class="product-card">
-      <a class="product-image" href="${destination}" target="_blank" rel="sponsored noopener">
+      <a class="product-image" href="${destination}" target="_blank" rel="sponsored noopener" data-track="amazon_product_image_${product.asin}">
         <img src="${product.image}" alt="${product.name}" loading="lazy">
       </a>
       <div class="product-body">
@@ -202,7 +202,7 @@ function productCard(product, categoryName) {
         <p class="product-description">${product.description}</p>
         <ul class="product-details">${product.details.map((detail) => `<li>${detail}</li>`).join('')}</ul>
         <p class="product-detail">See Amazon for current options and availability.</p>
-        <a class="amazon-link" href="${destination}" target="_blank" rel="sponsored noopener">
+        <a class="amazon-link" href="${destination}" target="_blank" rel="sponsored noopener" data-track="amazon_product_${product.asin}">
           Shop on Amazon <span aria-hidden="true">&rarr;</span>
         </a>
       </div>

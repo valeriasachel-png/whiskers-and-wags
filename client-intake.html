@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Private Whiskers & Wags client intake form for approved pet sitting and home sitting clients.">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Private Client Intake | Whiskers &amp; Wags</title>
+    <link rel="canonical" href="https://whiskersandwagsms.com/client-intake">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css?v=20260601-1">
+    <script src="/shared.js?v=20260601-1" defer></script>
+    <script src="/client-intake.js?v=20260601-1" defer></script>
+  </head>
+  <body class="intake-page">
+    <div data-site-header></div>
+    <main>
+      <section class="page-hero">
+        <div class="container">
+          <div class="eyebrow">For Confirmed Clients</div>
+          <h1>Private Client Intake</h1>
+          <p>Use this after Whiskers &amp; Wags has confirmed availability. This form sends private care details securely to the business inbox.</p>
+        </div>
+      </section>
+
+      <section class="section intake-section" aria-labelledby="intake-title">
+        <div class="container intake-layout">
+          <aside class="booking-assurance">
+            <div class="eyebrow">Care Details</div>
+            <h2 id="intake-title">Everything needed for a smooth first visit.</h2>
+            <p>Please only submit this form after your dates have been approved. If you are still checking availability, start with the request form first.</p>
+            <div class="assurance-list">
+              <div><span aria-hidden="true">1</span><p><strong>Approved first</strong>Availability should already be confirmed.</p></div>
+              <div><span aria-hidden="true">2</span><p><strong>Private details</strong>Address, access, vet, and emergency information are emailed privately.</p></div>
+              <div><span aria-hidden="true">3</span><p><strong>Organized care</strong>Routines are reviewed before the visit begins.</p></div>
+            </div>
+            <a class="button button-secondary" href="/request" data-track="cta_intake_to_request">Need to request care first?</a>
+          </aside>
+
+          <form class="panel intake-form" id="intake-form" novalidate>
+            <p class="form-status" id="intake-status" role="status" aria-live="polite" tabindex="-1"></p>
+            <div class="field-trap" aria-hidden="true">
+              <label for="intake-website">Leave this field empty</label>
+              <input id="intake-website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="intake-group">
+              <div class="step-heading">
+                <h2>Client &amp; home</h2>
+                <p>Tell us who this care plan belongs to and where care will take place.</p>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="clientName">Full Name <span class="required" aria-hidden="true">*</span></label>
+                  <input id="clientName" name="clientName" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label for="phone">Phone Number <span class="required" aria-hidden="true">*</span></label>
+                  <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+                </div>
+                <div class="field full">
+                  <label for="email">Email Address <span class="required" aria-hidden="true">*</span></label>
+                  <input id="email" name="email" type="email" autocomplete="email" required>
+                </div>
+                <div class="field full">
+                  <label for="address">Care Address <span class="required" aria-hidden="true">*</span></label>
+                  <textarea id="address" name="address" rows="3" autocomplete="street-address" required></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-group">
+              <div class="step-heading">
+                <h2>Emergency &amp; vet contacts</h2>
+                <p>Who should be contacted if something urgent comes up?</p>
+              </div>
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="emergencyContact">Emergency Contact <span class="required" aria-hidden="true">*</span></label>
+                  <textarea id="emergencyContact" name="emergencyContact" rows="3" required placeholder="Name, relationship, phone number"></textarea>
+                </div>
+                <div class="field full">
+                  <label for="vetInfo">Veterinarian Information</label>
+                  <textarea id="vetInfo" name="vetInfo" rows="3" placeholder="Clinic name, doctor, phone number, preferred emergency vet"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-group">
+              <div class="step-heading">
+                <h2>Pet routines</h2>
+                <p>Share the routine in plain language. The more specific, the smoother the care.</p>
+              </div>
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="petProfiles">Pet Names, Ages &amp; Personalities <span class="required" aria-hidden="true">*</span></label>
+                  <textarea id="petProfiles" name="petProfiles" rows="4" required></textarea>
+                </div>
+                <div class="field full">
+                  <label for="feedingSchedule">Feeding Schedule <span class="required" aria-hidden="true">*</span></label>
+                  <textarea id="feedingSchedule" name="feedingSchedule" rows="4" required placeholder="Food type, amount, timing, treats, bowl locations"></textarea>
+                </div>
+                <div class="field full">
+                  <label for="medicationNeeds">Medication or Special Needs</label>
+                  <textarea id="medicationNeeds" name="medicationNeeds" rows="4" placeholder="Medication names, timing, dose, hiding spots, mobility, anxiety, allergies"></textarea>
+                </div>
+                <div class="field full">
+                  <label for="dailyRoutine">Walks, Playtime &amp; Daily Routine</label>
+                  <textarea id="dailyRoutine" name="dailyRoutine" rows="4" placeholder="Walk route, leash location, litter boxes, favorite toys, comfort routines"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="intake-group">
+              <div class="step-heading">
+                <h2>Home access &amp; notes</h2>
+                <p>Only share access details here after approval. If you prefer, we can collect codes by phone instead.</p>
+              </div>
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="accessInstructions">Access Instructions</label>
+                  <textarea id="accessInstructions" name="accessInstructions" rows="4" placeholder="Door, key, alarm, parking, gate, entry timing"></textarea>
+                </div>
+                <div class="field full">
+                  <label for="homeCareNotes">Home Care Notes</label>
+                  <textarea id="homeCareNotes" name="homeCareNotes" rows="4" placeholder="Mail, plants, lights, trash, thermostat, anything to watch"></textarea>
+                </div>
+                <div class="field full">
+                  <label for="additionalNotes">Anything Else?</label>
+                  <textarea id="additionalNotes" name="additionalNotes" rows="4"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="button" type="submit" data-track="submit_client_intake">Send Private Intake</button>
+              <a class="button button-secondary" href="/assets/new-client-checklist.txt" download data-track="download_checklist_intake">Download Checklist</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+    <div data-site-footer></div>
+  </body>
+</html>

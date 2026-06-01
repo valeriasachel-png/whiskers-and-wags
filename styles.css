@@ -3855,6 +3855,368 @@ body::before {
   background: linear-gradient(135deg, var(--botanical), var(--palette-aqua));
 }
 
+.local-seo-section {
+  overflow: hidden;
+}
+
+.service-area-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.area-card,
+.sitter-card,
+.pricing-card,
+.review-cta-card,
+.faq-list details,
+.intake-form {
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.94), rgba(255, 225, 232, 0.26) 45%, rgba(222, 244, 214, 0.36)),
+    var(--white);
+  border: 1px solid rgba(18, 60, 52, 0.13);
+  box-shadow: 0 18px 54px rgba(18, 60, 52, 0.08);
+}
+
+.area-card {
+  border-radius: 24px;
+  min-height: 230px;
+  padding: 24px;
+  position: relative;
+}
+
+.area-card::before {
+  background: linear-gradient(90deg, var(--palette-pink), var(--palette-cream), var(--palette-aqua));
+  border-radius: 999px;
+  content: '';
+  height: 6px;
+  left: 24px;
+  position: absolute;
+  right: 24px;
+  top: 18px;
+}
+
+.area-card span,
+.review-form-badge {
+  color: var(--rose-deep);
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  margin: 16px 0 12px;
+  text-transform: uppercase;
+}
+
+.area-card h3 {
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+}
+
+.area-card p,
+.pricing-grid p,
+.sitter-copy p,
+.faq-layout p,
+.review-cta-card p {
+  color: rgba(18, 60, 52, 0.72);
+}
+
+.area-card-wide {
+  grid-column: span 2;
+}
+
+.sitter-section {
+  background:
+    radial-gradient(circle at 8% 10%, rgba(239, 154, 170, 0.26), transparent 22rem),
+    radial-gradient(circle at 90% 4%, rgba(49, 199, 188, 0.18), transparent 26rem),
+    linear-gradient(180deg, #fff9fb, #f4fff0);
+}
+
+.sitter-card {
+  align-items: center;
+  border-radius: 34px;
+  display: grid;
+  gap: clamp(24px, 5vw, 58px);
+  grid-template-columns: minmax(260px, 0.82fr) minmax(300px, 1.18fr);
+  overflow: hidden;
+  padding: clamp(18px, 3vw, 26px);
+}
+
+.sitter-photo {
+  border-radius: 28px;
+  box-shadow: 0 28px 72px rgba(18, 60, 52, 0.12);
+  height: min(460px, 48vw);
+  min-height: 280px;
+  overflow: hidden;
+}
+
+.sitter-photo img {
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+}
+
+.sitter-copy {
+  padding: clamp(8px, 3vw, 34px);
+}
+
+.pricing-grid,
+.faq-layout {
+  align-items: start;
+  display: grid;
+  gap: clamp(24px, 5vw, 58px);
+  grid-template-columns: minmax(280px, 0.9fr) minmax(300px, 1.1fr);
+}
+
+.pricing-card {
+  border-radius: 28px;
+  padding: clamp(24px, 4vw, 36px);
+}
+
+.pricing-card strong {
+  color: var(--palette-ink);
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  margin-bottom: 16px;
+}
+
+.pricing-card ul {
+  color: rgba(18, 60, 52, 0.72);
+  display: grid;
+  gap: 10px;
+  margin: 0 0 24px;
+  padding-left: 20px;
+}
+
+.faq-section {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 246, 215, 0.62), transparent 24rem),
+    radial-gradient(circle at 88% 30%, rgba(49, 199, 188, 0.16), transparent 24rem),
+    linear-gradient(180deg, #fff9fb, #f6fff3);
+}
+
+.faq-list {
+  display: grid;
+  gap: 12px;
+}
+
+.faq-list details {
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.faq-list summary {
+  color: var(--palette-ink);
+  cursor: pointer;
+  font-weight: 800;
+  list-style: none;
+  padding: 20px 22px;
+}
+
+.faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-list summary::after {
+  color: var(--rose-deep);
+  content: '+';
+  float: right;
+  font-size: 1.2rem;
+}
+
+.faq-list details[open] summary::after {
+  content: '-';
+}
+
+.faq-list p {
+  border-top: 1px solid rgba(18, 60, 52, 0.09);
+  margin: 0;
+  padding: 0 22px 20px;
+}
+
+.review-cta-card {
+  align-items: center;
+  border-radius: 32px;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(280px, 1fr) auto;
+  padding: clamp(26px, 5vw, 46px);
+}
+
+.review-cta-actions,
+.cta-actions-stack,
+.success-actions,
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.review-cta-actions {
+  justify-content: flex-end;
+}
+
+.cta-actions-stack {
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.cta-banner .button-secondary {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--white);
+}
+
+.success-actions {
+  justify-content: center;
+}
+
+.anchor-offset {
+  display: block;
+  position: relative;
+  top: -110px;
+}
+
+.intake-section {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(239, 154, 170, 0.26), transparent 24rem),
+    radial-gradient(circle at 92% 10%, rgba(49, 199, 188, 0.2), transparent 26rem),
+    linear-gradient(180deg, #fff9fb, #f5fff2);
+}
+
+.intake-layout {
+  align-items: start;
+  display: grid;
+  gap: clamp(22px, 3vw, 34px);
+  grid-template-columns: minmax(260px, 0.72fr) minmax(520px, 1.28fr);
+}
+
+.intake-form {
+  border-radius: 30px;
+  padding: clamp(22px, 4vw, 36px);
+}
+
+.intake-group {
+  border-bottom: 1px solid rgba(18, 60, 52, 0.1);
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+}
+
+.intake-group:last-of-type {
+  border-bottom: 0;
+  margin-bottom: 8px;
+}
+
+.inline-intake {
+  background:
+    radial-gradient(circle at 96% 0%, rgba(49, 199, 188, 0.16), transparent 14rem),
+    linear-gradient(145deg, rgba(255, 225, 232, 0.42), rgba(222, 244, 214, 0.42));
+  border: 1px solid rgba(18, 60, 52, 0.13);
+  border-radius: 22px;
+  margin: 20px 0;
+  overflow: hidden;
+}
+
+.inline-intake summary {
+  align-items: center;
+  color: var(--palette-ink);
+  cursor: pointer;
+  display: flex;
+  font-weight: 850;
+  gap: 12px;
+  justify-content: space-between;
+  list-style: none;
+  padding: 18px 20px;
+}
+
+.inline-intake summary::-webkit-details-marker {
+  display: none;
+}
+
+.inline-intake summary::after {
+  color: var(--rose-deep);
+  content: '+';
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.inline-intake[open] summary::after {
+  content: '-';
+}
+
+.inline-intake summary span {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(239, 154, 170, 0.34);
+  border-radius: 999px;
+  color: var(--rose-deep);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  padding: 5px 9px;
+  text-transform: uppercase;
+}
+
+.inline-intake > .privacy-note,
+.inline-intake > .field-grid,
+.inline-intake > .button {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.inline-intake > .button {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 940px) {
+  .service-area-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sitter-card,
+  .pricing-grid,
+  .faq-layout,
+  .review-cta-card,
+  .intake-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .review-cta-actions,
+  .cta-actions-stack {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .review-cta-actions .button,
+  .cta-actions-stack .button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 680px) {
+  .service-area-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .area-card-wide {
+    grid-column: auto;
+  }
+
+  .area-card {
+    min-height: 0;
+  }
+
+  .sitter-photo {
+    height: 280px;
+  }
+
+  .review-cta-card,
+  .sitter-card,
+  .pricing-card,
+  .intake-form {
+    border-radius: 24px;
+  }
+}
+
 @media (max-width: 680px) {
   body::before {
     height: 7px;

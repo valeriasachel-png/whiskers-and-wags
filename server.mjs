@@ -76,9 +76,14 @@ function validateRequest(input) {
     petTypes: cleanText(input.petTypes, 100),
     petCount: cleanText(input.petCount, 3),
     initialNeeds: cleanText(input.initialNeeds),
+    vetInfo: cleanText(input.vetInfo, 600),
+    petProfiles: cleanText(input.petProfiles, 1200),
     careInstructions: cleanText(input.careInstructions),
     feedingSchedule: cleanText(input.feedingSchedule),
     medicalNeeds: cleanText(input.medicalNeeds),
+    dailyRoutine: cleanText(input.dailyRoutine, 1200),
+    accessInstructions: cleanText(input.accessInstructions, 1200),
+    homeCareNotes: cleanText(input.homeCareNotes, 1200),
     emergencyContact: cleanText(input.emergencyContact, 200),
     additionalNotes: cleanText(input.additionalNotes),
   };
@@ -140,6 +145,33 @@ function validateReview(input) {
   return { details };
 }
 
+function validateIntake(input) {
+  const details = {
+    clientName: cleanText(input.clientName, 120),
+    phone: cleanText(input.phone, 60),
+    email: cleanText(input.email, 160),
+    address: cleanText(input.address, 500),
+    emergencyContact: cleanText(input.emergencyContact, 500),
+    vetInfo: cleanText(input.vetInfo, 600),
+    petProfiles: cleanText(input.petProfiles, 1200),
+    feedingSchedule: cleanText(input.feedingSchedule, 1200),
+    medicationNeeds: cleanText(input.medicationNeeds, 1200),
+    dailyRoutine: cleanText(input.dailyRoutine, 1200),
+    accessInstructions: cleanText(input.accessInstructions, 1200),
+    homeCareNotes: cleanText(input.homeCareNotes, 1200),
+    additionalNotes: cleanText(input.additionalNotes, 1200),
+  };
+
+  const required = ['clientName', 'phone', 'email', 'address', 'emergencyContact', 'petProfiles', 'feedingSchedule'];
+  if (required.some((field) => !details[field])) {
+    return { error: 'Please complete all required intake fields before sending.' };
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(details.email)) {
+    return { error: 'Please enter a valid email address.' };
+  }
+  return { details };
+}
+
 function requestAllowed(request) {
   const forwardedAddress = cleanText(request.headers['x-forwarded-for'], 100).split(',')[0].trim();
   const address = forwardedAddress || request.socket.remoteAddress || 'unknown';
@@ -192,11 +224,16 @@ async function submitRequest(request, response) {
           initialNeeds: 'Initial Needs Note',
         }
       : {}),
-    ...(validation.details.address ? { address: 'Address (legacy request)' } : {}),
+    ...(validation.details.address ? { address: 'Private Intake: Care Address' } : {}),
+    ...(validation.details.vetInfo ? { vetInfo: 'Veterinarian Information' } : {}),
+    ...(validation.details.petProfiles ? { petProfiles: 'Private Intake: Pet Names, Ages & Personalities' } : {}),
     ...(validation.details.careInstructions ? { careInstructions: 'Pet Care Instructions' } : {}),
-    ...(validation.details.feedingSchedule ? { feedingSchedule: 'Feeding Schedule' } : {}),
-    ...(validation.details.medicalNeeds ? { medicalNeeds: 'Medication or Special Needs' } : {}),
-    ...(validation.details.emergencyContact ? { emergencyContact: 'Emergency Contact' } : {}),
+    ...(validation.details.feedingSchedule ? { feedingSchedule: 'Private Intake: Feeding Schedule' } : {}),
+    ...(validation.details.medicalNeeds ? { medicalNeeds: 'Private Intake: Medication or Special Needs' } : {}),
+    ...(validation.details.dailyRoutine ? { dailyRoutine: 'Walks, Playtime & Daily Routine' } : {}),
+    ...(validation.details.accessInstructions ? { accessInstructions: 'Access Instructions' } : {}),
+    ...(validation.details.homeCareNotes ? { homeCareNotes: 'Home Care Notes' } : {}),
+    ...(validation.details.emergencyContact ? { emergencyContact: 'Private Intake: Emergency Contact' } : {}),
     ...(validation.details.additionalNotes ? { additionalNotes: 'Additional Notes' } : {}),
   };
   const body = Object.entries(labels)
@@ -295,12 +332,102 @@ async function submitReview(request, response) {
   }
 }
 
+async function submitIntake(request, response) {
+  let input;
+  try {
+    input = await readJson(request);
+  } catch {
+    return json(response, 400, { message: 'Please submit valid intake details.' });
+  }
+  // Simple honeypot: automated submissions often populate this invisible field.
+  if (cleanText(input.website, 100)) return json(response, 201, { message: 'Intake sent.' });
+  const validation = validateIntake(input);
+  if (validation.error) return json(response, 400, { message: validation.error });
+  if (!requestAllowed(request)) {
+    return json(response, 429, { message: 'Too many intake forms have been submitted. Please try again a little later.' });
+  }
+
+  const destination = process.env.BUSINESS_EMAIL;
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!destination || destination.includes('PUT MY EMAIL HERE') || !apiKey || apiKey.includes('your_api_key')) {
+    return json(response, 503, {
+      message: 'Online intake delivery is being set up. Please contact Whiskers and Wags directly for now.',
+    });
+  }
+
+  const labels = {
+    clientName: 'Client Name',
+    phone: 'Phone Number',
+    email: 'Email Address',
+    address: 'Care Address',
+    emergencyContact: 'Emergency Contact',
+    vetInfo: 'Veterinarian Information',
+    petProfiles: 'Pet Names, Ages & Personalities',
+    feedingSchedule: 'Feeding Schedule',
+    medicationNeeds: 'Medication or Special Needs',
+    dailyRoutine: 'Walks, Playtime & Daily Routine',
+    accessInstructions: 'Access Instructions',
+    homeCareNotes: 'Home Care Notes',
+    additionalNotes: 'Additional Notes',
+  };
+  const body = Object.entries(labels)
+    .map(([key, label]) => `${label}:\n${validation.details[key] || 'Not provided'}`)
+    .join('\n\n');
+
+  try {
+    const emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM || 'Whiskers and Wags <onboarding@resend.dev>',
+        to: [destination],
+        reply_to: validation.details.email,
+        subject: `Private client intake from ${validation.details.clientName}`,
+        text: body,
+      }),
+    });
+    if (!emailResponse.ok) {
+      console.error('Email provider rejected intake:', emailResponse.status, await emailResponse.text());
+      return json(response, 502, { message: 'We could not send your intake right now. Please try again shortly.' });
+    }
+    return json(response, 201, { message: 'Intake sent.' });
+  } catch (error) {
+    console.error('Email intake failed:', error.message);
+    return json(response, 502, { message: 'We could not send your intake right now. Please try again shortly.' });
+  }
+}
+
+async function submitEvent(request, response) {
+  let input;
+  try {
+    input = await readJson(request);
+  } catch {
+    return json(response, 400, { message: 'Please submit valid analytics details.' });
+  }
+  const event = {
+    event: cleanText(input.event, 120),
+    path: cleanText(input.path, 220),
+    target: cleanText(input.target, 300),
+    timestamp: new Date().toISOString(),
+  };
+  if (event.event) console.log('conversion-event', event);
+  response.writeHead(204, {
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  return response.end();
+}
+
 async function serveStatic(request, response, url) {
   const cleanRouteFiles = {
     '/request': '/request.html',
     '/gallery': '/gallery.html',
     '/picks': '/picks.html',
     '/privacy': '/privacy.html',
+    '/client-intake': '/client-intake.html',
   };
   const requested =
     url.pathname === '/' ? '/index.html' : cleanRouteFiles[url.pathname] || decodeURIComponent(url.pathname);
@@ -345,6 +472,12 @@ const server = createServer(async (request, response) => {
   }
   if (request.method === 'POST' && url.pathname === '/api/reviews') {
     return submitReview(request, response);
+  }
+  if (request.method === 'POST' && url.pathname === '/api/intake') {
+    return submitIntake(request, response);
+  }
+  if (request.method === 'POST' && url.pathname === '/api/events') {
+    return submitEvent(request, response);
   }
   if (request.method === 'GET' || request.method === 'HEAD') return serveStatic(request, response, url);
   response.writeHead(405, { Allow: 'GET, HEAD, POST' });
