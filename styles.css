@@ -4108,65 +4108,6 @@ body::before {
   margin-bottom: 8px;
 }
 
-.inline-intake {
-  background:
-    radial-gradient(circle at 96% 0%, rgba(49, 199, 188, 0.16), transparent 14rem),
-    linear-gradient(145deg, rgba(255, 225, 232, 0.42), rgba(222, 244, 214, 0.42));
-  border: 1px solid rgba(18, 60, 52, 0.13);
-  border-radius: 22px;
-  margin: 20px 0;
-  overflow: hidden;
-}
-
-.inline-intake summary {
-  align-items: center;
-  color: var(--palette-ink);
-  cursor: pointer;
-  display: flex;
-  font-weight: 850;
-  gap: 12px;
-  justify-content: space-between;
-  list-style: none;
-  padding: 18px 20px;
-}
-
-.inline-intake summary::-webkit-details-marker {
-  display: none;
-}
-
-.inline-intake summary::after {
-  color: var(--rose-deep);
-  content: '+';
-  font-size: 1.3rem;
-  line-height: 1;
-}
-
-.inline-intake[open] summary::after {
-  content: '-';
-}
-
-.inline-intake summary span {
-  background: rgba(255, 255, 255, 0.68);
-  border: 1px solid rgba(239, 154, 170, 0.34);
-  border-radius: 999px;
-  color: var(--rose-deep);
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  padding: 5px 9px;
-  text-transform: uppercase;
-}
-
-.inline-intake > .privacy-note,
-.inline-intake > .field-grid,
-.inline-intake > .button {
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-.inline-intake > .button {
-  margin-bottom: 20px;
-}
-
 @media (max-width: 940px) {
   .service-area-grid {
     grid-template-columns: repeat(2, 1fr);

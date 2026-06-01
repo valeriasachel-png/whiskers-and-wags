@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="/styles.css?v=20260601-1">
     <script src="/shared.js?v=20260601-1" defer></script>
     <script src="/request.js?v=20260601-1" defer></script>
-    <script src="/client-intake.js?v=20260601-1" defer></script>
   </head>
   <body class="request-page">
     <div data-site-header></div>
@@ -178,56 +177,6 @@
               <div class="review-chips" id="review-chips"></div>
               <p id="review-contact"></p>
             </section>
-
-            <details class="inline-intake">
-              <summary>
-                Already approved? Add private intake details to this same request email
-                <span>Optional</span>
-              </summary>
-              <div class="privacy-note intake-lock-note">
-                <strong>Use this only after Whiskers &amp; Wags confirms availability.</strong>
-                If you are still checking dates, send the simple request first and we will collect these details later.
-              </div>
-              <div class="field-grid">
-                <div class="field full">
-                  <label for="address">Care Address</label>
-                  <textarea id="address" name="address" rows="3" autocomplete="street-address"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="emergencyContact">Emergency Contact</label>
-                  <textarea id="emergencyContact" name="emergencyContact" rows="3" placeholder="Name, relationship, phone number"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="vetInfo">Veterinarian Information</label>
-                  <textarea id="vetInfo" name="vetInfo" rows="3" placeholder="Clinic name, doctor, phone number, preferred emergency vet"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="petProfiles">Pet Names, Ages &amp; Personalities</label>
-                  <textarea id="petProfiles" name="petProfiles" rows="4"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="feedingSchedule">Feeding Schedule</label>
-                  <textarea id="feedingSchedule" name="feedingSchedule" rows="4" placeholder="Food type, amount, timing, treats, bowl locations"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="medicalNeeds">Medication or Special Needs</label>
-                  <textarea id="medicalNeeds" name="medicalNeeds" rows="4" placeholder="Medication names, timing, dose, allergies, mobility, anxiety"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="dailyRoutine">Walks, Playtime &amp; Daily Routine</label>
-                  <textarea id="dailyRoutine" name="dailyRoutine" rows="4" placeholder="Walk route, leash location, litter boxes, favorite toys, comfort routines"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="accessInstructions">Access Instructions</label>
-                  <textarea id="accessInstructions" name="accessInstructions" rows="4" placeholder="Door, key, alarm, parking, gate, entry timing"></textarea>
-                </div>
-                <div class="field full">
-                  <label for="homeCareNotes">Home Care Notes</label>
-                  <textarea id="homeCareNotes" name="homeCareNotes" rows="4" placeholder="Mail, plants, lights, trash, thermostat, anything to watch"></textarea>
-                </div>
-              </div>
-              <a class="button button-secondary button-small" href="/assets/new-client-checklist.txt" download data-track="download_checklist_inline_intake">Download Checklist</a>
-            </details>
             <div class="step-actions">
               <button class="button button-secondary" type="button" data-previous-step>Back</button>
               <button class="button" id="submit-request" type="submit">Send My Request</button>
@@ -245,137 +194,9 @@
             <strong>What happens next?</strong>
             <p>We will review your dates, reach out personally, and gather detailed care information only after confirming the fit.</p>
           </div>
-          <div class="success-actions">
-            <a class="button" href="/assets/new-client-checklist.txt" download data-track="download_checklist_success">Download New-Client Checklist</a>
-            <a class="button button-secondary" href="#client-intake" data-track="cta_client_intake_success">Client Intake After Approval</a>
-            <button class="button button-secondary" id="new-request" type="button">Send Another Request</button>
-          </div>
+          <button class="button button-secondary" id="new-request" type="button">Send Another Request</button>
         </section>
       </div>
-
-      <section class="section intake-section request-intake-section" id="client-intake" aria-labelledby="request-intake-title">
-        <div class="container">
-          <div class="section-heading">
-            <div class="eyebrow">After We Confirm Your Dates</div>
-            <h2 id="request-intake-title">Complete your private care intake in the same booking flow.</h2>
-            <p>This is the second step after availability is approved. It gathers address, emergency, vet, access, feeding, medication, and routine details privately.</p>
-          </div>
-
-          <div class="intake-flow-shell">
-            <div class="intake-flow-steps" aria-label="Scheduling and intake flow">
-              <div><span>1</span><strong>Request dates</strong><p>Send the simple scheduling inquiry above.</p></div>
-              <div><span>2</span><strong>Confirm availability</strong><p>We personally reply before collecting sensitive details.</p></div>
-              <div><span>3</span><strong>Private intake</strong><p>Approved clients complete routines and home-care notes here.</p></div>
-            </div>
-
-            <form class="panel intake-form" id="intake-form" novalidate>
-              <p class="form-status" id="intake-status" role="status" aria-live="polite" tabindex="-1"></p>
-              <div class="field-trap" aria-hidden="true">
-                <label for="intake-website">Leave this field empty</label>
-                <input id="intake-website" name="website" tabindex="-1" autocomplete="off">
-              </div>
-
-              <div class="privacy-note intake-lock-note">
-                <strong>Only complete this after approval.</strong>
-                If you have not received confirmation yet, use the request form first and wait for a personal reply.
-              </div>
-
-              <div class="intake-group">
-                <div class="step-heading">
-                  <h3>Client &amp; home</h3>
-                  <p>Tell us who this care plan belongs to and where care will take place.</p>
-                </div>
-                <div class="field-grid">
-                  <div class="field">
-                    <label for="intake-client-name">Full Name <span class="required" aria-hidden="true">*</span></label>
-                    <input id="intake-client-name" name="clientName" autocomplete="name" required>
-                  </div>
-                  <div class="field">
-                    <label for="intake-phone">Phone Number <span class="required" aria-hidden="true">*</span></label>
-                    <input id="intake-phone" name="phone" type="tel" autocomplete="tel" required>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-email">Email Address <span class="required" aria-hidden="true">*</span></label>
-                    <input id="intake-email" name="email" type="email" autocomplete="email" required>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-address">Care Address <span class="required" aria-hidden="true">*</span></label>
-                    <textarea id="intake-address" name="address" rows="3" autocomplete="street-address" required></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <div class="intake-group">
-                <div class="step-heading">
-                  <h3>Emergency &amp; vet contacts</h3>
-                  <p>Who should be contacted if something urgent comes up?</p>
-                </div>
-                <div class="field-grid">
-                  <div class="field full">
-                    <label for="intake-emergency-contact">Emergency Contact <span class="required" aria-hidden="true">*</span></label>
-                    <textarea id="intake-emergency-contact" name="emergencyContact" rows="3" required placeholder="Name, relationship, phone number"></textarea>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-vet-info">Veterinarian Information</label>
-                    <textarea id="intake-vet-info" name="vetInfo" rows="3" placeholder="Clinic name, doctor, phone number, preferred emergency vet"></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <div class="intake-group">
-                <div class="step-heading">
-                  <h3>Pet routines</h3>
-                  <p>Share the routine in plain language. The more specific, the smoother the care.</p>
-                </div>
-                <div class="field-grid">
-                  <div class="field full">
-                    <label for="intake-pet-profiles">Pet Names, Ages &amp; Personalities <span class="required" aria-hidden="true">*</span></label>
-                    <textarea id="intake-pet-profiles" name="petProfiles" rows="4" required></textarea>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-feeding-schedule">Feeding Schedule <span class="required" aria-hidden="true">*</span></label>
-                    <textarea id="intake-feeding-schedule" name="feedingSchedule" rows="4" required placeholder="Food type, amount, timing, treats, bowl locations"></textarea>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-medication-needs">Medication or Special Needs</label>
-                    <textarea id="intake-medication-needs" name="medicationNeeds" rows="4" placeholder="Medication names, timing, dose, hiding spots, mobility, anxiety, allergies"></textarea>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-daily-routine">Walks, Playtime &amp; Daily Routine</label>
-                    <textarea id="intake-daily-routine" name="dailyRoutine" rows="4" placeholder="Walk route, leash location, litter boxes, favorite toys, comfort routines"></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <div class="intake-group">
-                <div class="step-heading">
-                  <h3>Home access &amp; notes</h3>
-                  <p>Only share access details here after approval. If you prefer, we can collect codes by phone instead.</p>
-                </div>
-                <div class="field-grid">
-                  <div class="field full">
-                    <label for="intake-access-instructions">Access Instructions</label>
-                    <textarea id="intake-access-instructions" name="accessInstructions" rows="4" placeholder="Door, key, alarm, parking, gate, entry timing"></textarea>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-home-care-notes">Home Care Notes</label>
-                    <textarea id="intake-home-care-notes" name="homeCareNotes" rows="4" placeholder="Mail, plants, lights, trash, thermostat, anything to watch"></textarea>
-                  </div>
-                  <div class="field full">
-                    <label for="intake-additional-notes">Anything Else?</label>
-                    <textarea id="intake-additional-notes" name="additionalNotes" rows="4"></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <button class="button" type="submit" data-track="submit_client_intake">Send Private Intake</button>
-                <a class="button button-secondary" href="/assets/new-client-checklist.txt" download data-track="download_checklist_intake">Download Checklist</a>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
     </main>
     <div data-site-footer></div>
   </body>
