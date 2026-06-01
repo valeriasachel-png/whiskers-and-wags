@@ -41,7 +41,7 @@ intakeForm.addEventListener('submit', async (event) => {
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || 'We could not send the intake right now.');
     intakeForm.reset();
-    setIntakeStatus('Thank you. Your private intake details were sent to Whiskers & Wags.', 'success');
+    setIntakeStatus('Thank you. Your private intake details were sent to Whiskers & Wags. A printable PDF copy was included for our records.', 'success');
   } catch (error) {
     setIntakeStatus(error.message, 'error');
   } finally {
