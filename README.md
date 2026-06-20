@@ -6,7 +6,7 @@ A responsive multi-page website for a pet sitting and home sitting business. It 
 - Accessible three-step request flow with multi-date calendar selection and essential-first intake
 - Swipeable photo journal with all gallery photos and a client-notes area ready for approved quotes
 - Exact Amazon product recommendations with active Associates tracking disclosure
-- Server-side booking and private review delivery through Cloudflare Pages Functions and Resend
+- Server-side booking, private review delivery, and approval-based public reviews through Cloudflare Pages Functions, Cloudflare KV, and Resend
 - Basic bot-trap protection for request and review submissions
 
 ## Run Locally
@@ -23,7 +23,7 @@ On a machine with Node.js 18 or newer already installed, `node server.mjs` works
 
 ## Connect Request Emails
 
-The forms deliberately do not use `mailto:` or put credentials in browser code. On the live site, requests post to `/api/requests`, where `functions/api/requests.js` validates them and sends email through [Resend](https://resend.com). Client notes post privately to `/api/reviews`, where `functions/api/reviews.js` validates the 1-5 star rating and sends the review for approval. `server.mjs` provides the same endpoints for local testing.
+The forms deliberately do not use `mailto:` or put credentials in browser code. On the live site, requests post to `/api/requests`, where `functions/api/requests.js` validates them and sends email through [Resend](https://resend.com). Client notes post privately to `/api/reviews`, where `functions/api/reviews.js` validates the 1-5 star rating, stores the note as pending in Cloudflare KV, and sends the review email with an approval button when the client gave publishing permission. `server.mjs` provides the same endpoints for local testing.
 
 1. Copy `.env.example` to `.env`.
 2. Confirm `BUSINESS_EMAIL=whiskersandwags811@gmail.com` is the inbox that should receive booking requests.
@@ -41,6 +41,14 @@ PORT=4173
 ```
 
 For deployment, configure the same values in Cloudflare Pages. Save `RESEND_API_KEY` as an encrypted secret. Do not commit `.env` or expose `RESEND_API_KEY` in frontend files.
+
+Client-note approval also requires a Cloudflare KV namespace bound to the Pages project with this exact binding name:
+
+```text
+REVIEWS_KV
+```
+
+The approval email button uses `SITE_URL` when it is present. Set `SITE_URL=https://whiskersandwagsms.com` in Cloudflare Pages variables.
 
 ## Customize Content
 
@@ -66,8 +74,10 @@ Cloudflare Pages hosts the website and runs the booking and review email handler
    - `BUSINESS_EMAIL`: `whiskersandwags811@gmail.com`
    - `EMAIL_FROM`: `Whiskers & Wags <bookings@whiskersandwagsms.com>`
    - `RESEND_API_KEY`: the Resend sending key, saved as an encrypted secret
-6. Redeploy after saving the variables, then submit a real test request.
-7. Under the Pages project **Custom domains**, add `whiskersandwagsms.com` and `www.whiskersandwagsms.com`.
+   - `SITE_URL`: `https://whiskersandwagsms.com`
+6. Create a Cloudflare KV namespace for reviews and bind it to the Pages project as `REVIEWS_KV`.
+7. Redeploy after saving the variables, then submit a real test request and a client-note approval test.
+8. Under the Pages project **Custom domains**, add `whiskersandwagsms.com` and `www.whiskersandwagsms.com`.
 
 The `_headers` file provides browser security headers on Cloudflare Pages. The email functions keep the Resend API key on Cloudflare, never in the public website code.
 

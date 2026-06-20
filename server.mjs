@@ -1,6 +1,7 @@
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,6 +28,8 @@ loadLocalEnvironment();
 
 const PORT = Number(process.env.PORT || 4173);
 const requestWindows = new Map();
+const localPendingReviews = new Map();
+let localApprovedReviews = [];
 const REQUEST_LIMIT = 5;
 const REQUEST_WINDOW_MS = 15 * 60 * 1000;
 const contentTypes = {
@@ -138,6 +141,34 @@ function validateReview(input) {
   }
 
   return { details };
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
+function makeId() {
+  return randomBytes(16).toString('hex');
+}
+
+function siteUrl(request) {
+  return String(process.env.SITE_URL || `http://${request.headers.host || `localhost:${PORT}`}`).replace(/\/$/, '');
+}
+
+function publicReview(record) {
+  return {
+    id: record.id,
+    rating: record.rating,
+    review: record.review,
+    displayName: record.displayName,
+    approvedAt: record.approvedAt,
+  };
 }
 
 function validateIntake(input) {
@@ -422,6 +453,24 @@ async function submitReview(request, response) {
     });
   }
 
+  const reviewRecord = {
+    id: makeId(),
+    token: makeId(),
+    status: 'pending',
+    rating: validation.details.rating,
+    review: validation.details.review,
+    displayName: validation.details.displayName.split(/\s+/)[0],
+    email: validation.details.email,
+    publishPermission: validation.details.publishPermission,
+    createdAt: new Date().toISOString(),
+  };
+  localPendingReviews.set(reviewRecord.token, reviewRecord);
+
+  const approvalUrl = `${siteUrl(request)}/api/review-approve?token=${encodeURIComponent(reviewRecord.token)}`;
+  const permissionCopy = reviewRecord.publishPermission
+    ? `Accept and publish this note: ${approvalUrl}`
+    : 'The client did not give permission to feature this note, so no approval link was included.';
+
   const labels = {
     rating: 'Star Rating',
     displayName: 'Display Name',
@@ -436,7 +485,27 @@ async function submitReview(request, response) {
         : validation.details[key];
       return `${label}:\n${value}`;
     })
-    .join('\n\n');
+    .join('\n\n') + `\n\n${permissionCopy}`;
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#24352f;line-height:1.5;max-width:640px">
+      <h1 style="color:#24352f;font-size:24px;margin:0 0 8px">New client note</h1>
+      <p style="margin:0 0 18px">A client submitted a ${reviewRecord.rating}-star note for Whiskers &amp; Wags.</p>
+      <div style="background:#fff7f5;border:1px solid #f1c7cf;border-radius:18px;padding:18px;margin:0 0 18px">
+        <p><strong>Display name:</strong> ${escapeHtml(reviewRecord.displayName)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(reviewRecord.email)}</p>
+        <p><strong>Rating:</strong> ${'★'.repeat(reviewRecord.rating)}${'☆'.repeat(5 - reviewRecord.rating)}</p>
+        <p><strong>Permission:</strong> ${reviewRecord.publishPermission ? 'Yes, first name and note may be featured after review.' : 'No, keep private for now.'}</p>
+        <p><strong>Client note:</strong><br>${escapeHtml(reviewRecord.review).replace(/\n/g, '<br>')}</p>
+      </div>
+      ${reviewRecord.publishPermission ? `
+        <a href="${escapeHtml(approvalUrl)}" style="display:inline-block;background:#2f6f59;color:#ffffff;text-decoration:none;font-weight:700;border-radius:999px;padding:13px 20px">Accept &amp; Publish Review</a>
+        <p style="font-size:13px;color:#66756e;margin-top:12px">Clicking the button approves this note and allows it to appear on the Gallery &amp; Client Notes page.</p>
+      ` : `
+        <p style="background:#f8eadf;border-radius:14px;padding:12px 14px"><strong>Private only:</strong> The client did not grant publishing permission.</p>
+      `}
+    </div>
+  `;
 
   try {
     const emailResponse = await fetch('https://api.resend.com/emails', {
@@ -451,6 +520,7 @@ async function submitReview(request, response) {
         reply_to: validation.details.email,
         subject: `New ${validation.details.rating}-star client note from ${validation.details.displayName}`,
         text: body,
+        html,
       }),
     });
     if (!emailResponse.ok) {
@@ -462,6 +532,94 @@ async function submitReview(request, response) {
     console.error('Email review failed:', error.message);
     return json(response, 502, { message: 'We could not send your note right now. Please try again shortly.' });
   }
+}
+
+function reviewApprovalPage(response, status, title, message) {
+  response.writeHead(status, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  response.end(`<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <title>${escapeHtml(title)} | Whiskers &amp; Wags</title>
+    <style>
+      :root { color-scheme: light; }
+      body {
+        align-items: center;
+        background: linear-gradient(135deg, #ffe3ea, #fff8df 45%, #dff4dc 75%, #31c7bc);
+        color: #24352f;
+        display: flex;
+        font-family: Arial, sans-serif;
+        justify-content: center;
+        margin: 0;
+        min-height: 100vh;
+        padding: 24px;
+      }
+      main {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(47, 111, 89, 0.18);
+        border-radius: 28px;
+        box-shadow: 0 28px 80px rgba(36, 53, 47, 0.16);
+        max-width: 620px;
+        padding: clamp(28px, 6vw, 48px);
+      }
+      h1 { font-size: clamp(2rem, 6vw, 3rem); margin: 0 0 12px; }
+      p { font-size: 1.05rem; line-height: 1.6; margin: 0 0 24px; }
+      a {
+        background: #2f6f59;
+        border-radius: 999px;
+        color: white;
+        display: inline-block;
+        font-weight: 700;
+        padding: 13px 20px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>${escapeHtml(title)}</h1>
+      <p>${escapeHtml(message)}</p>
+      <a href="/gallery">View Gallery &amp; Client Notes</a>
+    </main>
+  </body>
+</html>`);
+}
+
+function listApprovedReviews(response) {
+  return json(response, 200, { reviews: localApprovedReviews });
+}
+
+function approveReview(request, response) {
+  const url = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
+  const token = url.searchParams.get('token') || '';
+  if (!/^[a-f0-9]{32}$/.test(token)) {
+    return reviewApprovalPage(response, 400, 'Approval link is not valid', 'This review approval link is missing or malformed.');
+  }
+
+  const pending = localPendingReviews.get(token);
+  if (!pending) {
+    return reviewApprovalPage(response, 404, 'Review already handled', 'This client note may have already been approved, expired, or removed.');
+  }
+
+  if (!pending.publishPermission) {
+    localPendingReviews.delete(token);
+    return reviewApprovalPage(response, 403, 'Not approved for publishing', 'This client did not give permission to feature their note, so it was kept private.');
+  }
+
+  const approved = publicReview({ ...pending, approvedAt: new Date().toISOString() });
+  localApprovedReviews = [
+    approved,
+    ...localApprovedReviews.filter((review) => review.id !== pending.id),
+  ].slice(0, 12);
+  localPendingReviews.delete(token);
+
+  return reviewApprovalPage(response, 200, 'Review approved', 'This client note is now approved and can appear on the Gallery & Client Notes page.');
 }
 
 async function submitIntake(request, response) {
@@ -610,6 +768,12 @@ const server = createServer(async (request, response) => {
   }
   if (request.method === 'POST' && url.pathname === '/api/reviews') {
     return submitReview(request, response);
+  }
+  if (request.method === 'GET' && url.pathname === '/api/reviews') {
+    return listApprovedReviews(response);
+  }
+  if (request.method === 'GET' && url.pathname === '/api/review-approve') {
+    return approveReview(request, response);
   }
   if (request.method === 'POST' && url.pathname === '/api/intake') {
     return submitIntake(request, response);

@@ -15,6 +15,7 @@ const carouselNext = document.querySelector('#gallery-next');
 const thumbnailButtons = [...document.querySelectorAll('.gallery-thumb')];
 const reviewForm = document.querySelector('#review-form');
 const reviewStatus = document.querySelector('#review-status');
+const approvedNotes = document.querySelector('#approved-notes');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let activePhoto = 0;
@@ -131,6 +132,51 @@ function reviewValue(form, name) {
   return String(new FormData(form).get(name) || '').trim();
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
+function starText(rating) {
+  const value = Math.max(1, Math.min(5, Number(rating) || 5));
+  return `${'★'.repeat(value)}${'☆'.repeat(5 - value)}`;
+}
+
+function renderApprovedReviews(reviews) {
+  if (!approvedNotes) return;
+  if (!reviews.length) {
+    approvedNotes.innerHTML = '';
+    return;
+  }
+  approvedNotes.innerHTML = reviews.map((review) => `
+    <article class="approved-note-card">
+      <div class="approved-note-stars" aria-label="${Number(review.rating)} out of 5 stars">${starText(review.rating)}</div>
+      <p>${escapeHtml(review.review)}</p>
+      <footer>
+        <strong>${escapeHtml(review.displayName)}</strong>
+        <span>Approved client note</span>
+      </footer>
+    </article>
+  `).join('');
+}
+
+async function loadApprovedReviews() {
+  if (!approvedNotes) return;
+  try {
+    const response = await fetch('/api/reviews', { headers: { Accept: 'application/json' } });
+    if (!response.ok) return;
+    const result = await response.json();
+    renderApprovedReviews(Array.isArray(result.reviews) ? result.reviews : []);
+  } catch {
+    renderApprovedReviews([]);
+  }
+}
+
 reviewForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   setReviewStatus('');
@@ -171,3 +217,5 @@ reviewForm.addEventListener('submit', async (event) => {
     submitButton.textContent = 'Submit Client Note';
   }
 });
+
+loadApprovedReviews();

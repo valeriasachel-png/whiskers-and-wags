@@ -35,7 +35,56 @@ function validateReview(input) {
   return { details };
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
+function makeId() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function siteUrl(request, env) {
+  return String(env.SITE_URL || new URL(request.url).origin).replace(/\/$/, '');
+}
+
+function publicReview(record) {
+  return {
+    id: record.id,
+    rating: record.rating,
+    review: record.review,
+    displayName: record.displayName,
+    approvedAt: record.approvedAt,
+  };
+}
+
+async function readApprovedReviews(env) {
+  if (!env.REVIEWS_KV) return [];
+  const reviews = await env.REVIEWS_KV.get('approved-reviews', { type: 'json' });
+  return Array.isArray(reviews) ? reviews.slice(0, 12) : [];
+}
+
+async function savePendingReview(env, review) {
+  if (!env.REVIEWS_KV) return false;
+  await env.REVIEWS_KV.put(`pending-review:${review.token}`, JSON.stringify(review), {
+    expirationTtl: 60 * 60 * 24 * 90,
+  });
+  return true;
+}
+
 export async function onRequest({ request, env }) {
+  if (request.method === 'GET') {
+    const reviews = await readApprovedReviews(env);
+    return json(200, { reviews });
+  }
+
   if (request.method !== 'POST') {
     return json(405, { message: 'Method not allowed.' });
   }
@@ -61,6 +110,29 @@ export async function onRequest({ request, env }) {
       message: 'Online review delivery is being set up. Please contact Whiskers & Wags directly for now.',
     });
   }
+  if (!env.REVIEWS_KV) {
+    return json(503, {
+      message: 'Review approval storage is being set up. Please contact Whiskers & Wags directly for now.',
+    });
+  }
+
+  const reviewRecord = {
+    id: makeId(),
+    token: makeId(),
+    status: 'pending',
+    rating: validation.details.rating,
+    review: validation.details.review,
+    displayName: validation.details.displayName.split(/\s+/)[0],
+    email: validation.details.email,
+    publishPermission: validation.details.publishPermission,
+    createdAt: new Date().toISOString(),
+  };
+  await savePendingReview(env, reviewRecord);
+
+  const approvalUrl = `${siteUrl(request, env)}/api/review-approve?token=${encodeURIComponent(reviewRecord.token)}`;
+  const permissionCopy = reviewRecord.publishPermission
+    ? `Accept and publish this note: ${approvalUrl}`
+    : 'The client did not give permission to feature this note, so no approval link was included.';
 
   const labels = {
     rating: 'Star Rating',
@@ -76,7 +148,27 @@ export async function onRequest({ request, env }) {
         : validation.details[key];
       return `${label}:\n${value}`;
     })
-    .join('\n\n');
+    .join('\n\n') + `\n\n${permissionCopy}`;
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#24352f;line-height:1.5;max-width:640px">
+      <h1 style="color:#24352f;font-size:24px;margin:0 0 8px">New client note</h1>
+      <p style="margin:0 0 18px">A client submitted a ${reviewRecord.rating}-star note for Whiskers &amp; Wags.</p>
+      <div style="background:#fff7f5;border:1px solid #f1c7cf;border-radius:18px;padding:18px;margin:0 0 18px">
+        <p><strong>Display name:</strong> ${escapeHtml(reviewRecord.displayName)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(reviewRecord.email)}</p>
+        <p><strong>Rating:</strong> ${'★'.repeat(reviewRecord.rating)}${'☆'.repeat(5 - reviewRecord.rating)}</p>
+        <p><strong>Permission:</strong> ${reviewRecord.publishPermission ? 'Yes, first name and note may be featured after review.' : 'No, keep private for now.'}</p>
+        <p><strong>Client note:</strong><br>${escapeHtml(reviewRecord.review).replace(/\n/g, '<br>')}</p>
+      </div>
+      ${reviewRecord.publishPermission ? `
+        <a href="${escapeHtml(approvalUrl)}" style="display:inline-block;background:#2f6f59;color:#ffffff;text-decoration:none;font-weight:700;border-radius:999px;padding:13px 20px">Accept &amp; Publish Review</a>
+        <p style="font-size:13px;color:#66756e;margin-top:12px">Clicking the button approves this note and allows it to appear on the Gallery &amp; Client Notes page.</p>
+      ` : `
+        <p style="background:#f8eadf;border-radius:14px;padding:12px 14px"><strong>Private only:</strong> The client did not grant publishing permission.</p>
+      `}
+    </div>
+  `;
 
   try {
     const emailResponse = await fetch('https://api.resend.com/emails', {
@@ -91,6 +183,7 @@ export async function onRequest({ request, env }) {
         reply_to: validation.details.email,
         subject: `New ${validation.details.rating}-star client note from ${validation.details.displayName}`,
         text: body,
+        html,
       }),
     });
 
