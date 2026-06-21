@@ -14,7 +14,9 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/request', label: 'Request Care' },
   { href: '/gallery', label: 'Gallery & Client Notes' },
+  { href: '/social-events', label: 'Social & Events' },
   { href: '/picks', label: 'Pet Care Picks' },
+  { href: '/about', label: 'About Us' },
 ];
 
 function currentPath() {
@@ -25,6 +27,8 @@ function currentPath() {
     '/privacy.html': '/privacy',
     '/request.html': '/request',
     '/client-intake.html': '/client-intake',
+    '/social-events.html': '/social-events',
+    '/about.html': '/about',
   };
   if (path === '/index.html') return '/';
   return filePageAliases[path] ?? path;
@@ -147,6 +151,23 @@ const revealSelectors = {
     '.notes-intro',
     '.notes-card',
     '.review-form',
+    '.cta-banner',
+  ],
+  '/social-events': [
+    '.page-hero .container > *',
+    '.feature-card',
+    '.social-card',
+    '.event-card',
+    '.pet-place-card',
+    '.tip-card',
+    '.cta-banner',
+  ],
+  '/about': [
+    '.page-hero .container > *',
+    '.about-bio-card',
+    '.map-panel',
+    '.country-chip',
+    '.journey-card',
     '.cta-banner',
   ],
 };

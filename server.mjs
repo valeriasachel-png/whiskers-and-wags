@@ -724,6 +724,8 @@ async function serveStatic(request, response, url) {
     '/picks': '/picks.html',
     '/privacy': '/privacy.html',
     '/client-intake': '/client-intake.html',
+    '/social-events': '/social-events.html',
+    '/about': '/about.html',
   };
   const requested =
     url.pathname === '/' ? '/index.html' : cleanRouteFiles[url.pathname] || decodeURIComponent(url.pathname);
