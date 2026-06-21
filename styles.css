@@ -4720,3 +4720,184 @@ body::before {
     top: 14px;
   }
 }
+
+/* NEW PAGE RHYTHM: clearer chapter breaks for the social/events and about shells. */
+.social-page main,
+.about-page main {
+  overflow: hidden;
+}
+
+.social-page .page-hero,
+.about-page .page-hero {
+  border-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: clamp(76px, 9vw, 112px);
+}
+
+.social-feature-section,
+.about-main-section {
+  margin-top: clamp(-52px, -5vw, -32px);
+  padding-top: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.social-news-section,
+.social-events-section,
+.social-places-section,
+.social-tips-section,
+.social-submit-section,
+.about-submit-section {
+  position: relative;
+}
+
+.social-news-section,
+.social-places-section {
+  background:
+    linear-gradient(90deg, rgba(239, 154, 172, 0.68), rgba(255, 243, 201, 0.54), rgba(221, 245, 215, 0.64), rgba(50, 200, 190, 0.34)) top / 100% 9px no-repeat,
+    radial-gradient(circle at 8% 0%, rgba(239, 154, 172, 0.24), transparent 22rem),
+    radial-gradient(circle at 90% 12%, rgba(50, 200, 190, 0.14), transparent 24rem),
+    linear-gradient(180deg, #fff8fb 0%, #fffdf7 46%, #f5fff2 100%);
+  border-top: 1px solid rgba(47, 117, 94, 0.12);
+  border-bottom: 1px solid rgba(47, 117, 94, 0.12);
+}
+
+.social-events-section {
+  background:
+    radial-gradient(circle at 78% 0%, rgba(255, 226, 234, 0.5), transparent 24rem),
+    linear-gradient(180deg, #fffdf8 0%, #fff7ec 100%);
+}
+
+.social-tips-section {
+  border-top: 1px solid rgba(47, 117, 94, 0.12);
+  box-shadow: inset 0 28px 48px rgba(47, 117, 94, 0.045);
+}
+
+.social-submit-section,
+.about-submit-section {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(47, 117, 94, 0.1), transparent 26rem),
+    linear-gradient(180deg, #fffdf8, #f7fff5);
+  padding-top: clamp(50px, 7vw, 84px);
+}
+
+.social-feature-section::after,
+.social-news-section::after,
+.social-events-section::after,
+.social-places-section::after,
+.social-tips-section::after,
+.about-main-section::after {
+  background: linear-gradient(90deg, transparent, rgba(239, 154, 172, 0.46), rgba(50, 200, 190, 0.34), transparent);
+  bottom: 0;
+  content: '';
+  height: 1px;
+  left: max(24px, calc((100vw - 1180px) / 2 + 24px));
+  position: absolute;
+  right: max(24px, calc((100vw - 1180px) / 2 + 24px));
+}
+
+.social-page .section-heading,
+.about-page .section-heading {
+  position: relative;
+}
+
+.social-page .section-heading::before {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(239, 154, 172, 0.34);
+  border-radius: 999px;
+  color: var(--rose-deep);
+  display: inline-flex;
+  font-size: 0.76rem;
+  font-weight: 900;
+  height: 34px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+  width: 64px;
+}
+
+.social-news-section .section-heading::before {
+  content: '01';
+}
+
+.social-events-section .section-heading::before {
+  content: '02';
+}
+
+.social-places-section .section-heading::before {
+  content: '03';
+}
+
+.social-tips-section .section-heading::before {
+  content: '04';
+}
+
+.social-card-grid,
+.event-list,
+.pet-place-grid,
+.tip-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.social-news-section .social-card,
+.social-places-section .pet-place-card,
+.social-tips-section .tip-card {
+  border-color: rgba(239, 154, 172, 0.22);
+}
+
+.social-events-section .event-card {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 243, 201, 0.35)),
+    var(--white);
+  border-color: rgba(47, 117, 94, 0.18);
+}
+
+.about-main-section {
+  background:
+    radial-gradient(circle at 10% 8%, rgba(239, 154, 172, 0.18), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(50, 200, 190, 0.16), transparent 24rem),
+    linear-gradient(180deg, #fffdf8, #fff8fb 48%, #f6fff2);
+}
+
+.about-main-section .about-bio-card,
+.about-main-section .journey-card,
+.social-feature-section .feature-card {
+  box-shadow: 0 34px 88px rgba(18, 60, 52, 0.12), 0 10px 28px rgba(239, 154, 172, 0.09);
+}
+
+.about-submit-section .cta-banner,
+.social-submit-section .cta-banner {
+  margin-top: 0;
+}
+
+@media (max-width: 680px) {
+  .social-page .page-hero,
+  .about-page .page-hero {
+    padding-bottom: 66px;
+  }
+
+  .social-feature-section,
+  .about-main-section {
+    margin-top: -30px;
+  }
+
+  .social-news-section,
+  .social-events-section,
+  .social-places-section,
+  .social-tips-section {
+    padding-bottom: 58px;
+    padding-top: 58px;
+  }
+
+  .social-feature-section::after,
+  .social-news-section::after,
+  .social-events-section::after,
+  .social-places-section::after,
+  .social-tips-section::after,
+  .about-main-section::after {
+    left: 18px;
+    right: 18px;
+  }
+}
