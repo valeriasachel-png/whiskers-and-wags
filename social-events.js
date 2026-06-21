@@ -164,6 +164,7 @@ function renderFeed(feed, fromLiveEndpoint = false) {
           : 'Starter feed';
     updated.textContent = `${status} checked ${date}`;
   }
+  hydrateDynamicMotion();
 }
 
 async function hydrateLiveFeed() {
@@ -179,4 +180,40 @@ async function hydrateLiveFeed() {
 }
 
 document.querySelector('#pet-tips').innerHTML = petTips.map(tipTemplate).join('');
+
+function hydrateDynamicMotion() {
+  const cards = Array.from(document.querySelectorAll('.social-card, .event-card, .pet-place-card, .tip-card'));
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  cards.forEach((card, index) => {
+    card.classList.add('spotlight-card', 'reveal', 'reveal-ready');
+    card.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 45}ms`);
+    card.style.setProperty('--reveal-index', String(Math.min(index % 6, 5)));
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+      card.style.setProperty('--my', `${event.clientY - rect.top}px`);
+    });
+  });
+
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    cards.forEach((card) => card.classList.add('in-view'));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, motionObserver) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          motionObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { rootMargin: '0px 0px -8% 0px', threshold: 0.1 },
+  );
+
+  cards.forEach((card) => observer.observe(card));
+}
+
 hydrateLiveFeed();

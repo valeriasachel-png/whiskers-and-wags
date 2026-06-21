@@ -126,7 +126,7 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// MOTION EDIT: These selectors add gentle movement only on the home and gallery pages.
+// MOTION EDIT: These selectors add gentle premium movement across the site.
 const revealSelectors = {
   '/': [
     '.hero-copy > *',
@@ -145,16 +145,35 @@ const revealSelectors = {
     '.review-cta-card',
     '.cta-banner',
   ],
+  '/request': [
+    '.page-hero .container > *',
+    '.request-shell',
+    '.request-card',
+    '.request-review',
+    '.client-trust-panel',
+    '.cta-banner',
+  ],
   '/gallery': [
     '.page-hero .container > *',
     '.gallery-showcase',
+    '.gallery-thumb',
+    '.pet-card',
+    '.testimonial',
     '.notes-intro',
     '.notes-card',
     '.review-form',
     '.cta-banner',
   ],
+  '/picks': [
+    '.shop-hero .container > *',
+    '.shop-hero-grid > *',
+    '.disclosure',
+    '.category-filter',
+    '.category',
+    '.product-card',
+  ],
   '/social-events': [
-    '.page-hero .container > *',
+    '.social-hero-panel',
     '.feature-card',
     '.social-card',
     '.event-card',
@@ -168,6 +187,17 @@ const revealSelectors = {
     '.map-panel',
     '.country-chip',
     '.journey-card',
+    '.cta-banner',
+  ],
+  '/client-intake': [
+    '.page-hero .container > *',
+    '.intake-card',
+    '.form-grid > *',
+    '.cta-banner',
+  ],
+  '/privacy': [
+    '.page-hero .container > *',
+    '.privacy-card',
     '.cta-banner',
   ],
 };
@@ -199,6 +229,38 @@ if (revealTargets.length) {
     revealTargets.forEach((element) => revealObserver.observe(element));
   }
 }
+
+const spotlightSelectors = [
+  '.service-card',
+  '.trust-card',
+  '.testimonial',
+  '.product-card',
+  '.pet-card',
+  '.gallery-showcase',
+  '.notes-card',
+  '.review-form',
+  '.request-shell',
+  '.request-card',
+  '.choice-cards span',
+  '.feature-card',
+  '.social-card',
+  '.event-card',
+  '.pet-place-card',
+  '.tip-card',
+  '.about-bio-card',
+  '.journey-card',
+  '.cta-banner',
+];
+
+const spotlightTargets = Array.from(document.querySelectorAll(spotlightSelectors.join(',')));
+spotlightTargets.forEach((element) => {
+  element.classList.add('spotlight-card');
+  element.addEventListener('pointermove', (event) => {
+    const rect = element.getBoundingClientRect();
+    element.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+    element.style.setProperty('--my', `${event.clientY - rect.top}px`);
+  });
+});
 
 // CONVERSION TRACKING: privacy-friendly click events only, with no form details stored in the browser.
 function trackConversion(eventName, target = '') {
