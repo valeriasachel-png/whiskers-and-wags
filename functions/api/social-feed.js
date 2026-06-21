@@ -285,7 +285,43 @@ async function getGoogleNewsItems(query, type, limit = 6) {
   return items;
 }
 
+async function getPublicRssItems(url, type, sourceDefault, limit = 6) {
+  const xml = await fetchText(url);
+  return [...xml.matchAll(/<item\b[\s\S]*?<\/item>/gi)].slice(0, limit).map((match) => {
+    const item = match[0];
+    const rawDescription = tagValue(item, 'description') || tagValue(item, 'content:encoded');
+    const title = cleanText(tagValue(item, 'title'), 130);
+    const source = cleanText(tagValue(item, 'source') || sourceDefault, 70);
+    return {
+      title: title || 'Animal story',
+      type,
+      source,
+      summary: cleanText(stripHtml(rawDescription) || `Current item from ${source}. Open the source for full details before sharing.`, 190),
+      date: formatDate(tagValue(item, 'pubDate')),
+      link: tagValue(item, 'link') || '#',
+    };
+  }).filter((item) => item.title && item.link);
+}
+
+async function getAnimalStoriesFromRss() {
+  const feeds = await Promise.allSettled([
+    getPublicRssItems('https://www.aspca.org/rss.xml', 'Animal welfare', 'ASPCA', 4),
+    getPublicRssItems('https://www.akc.org/expert-advice/feed/', 'Pet care note', 'American Kennel Club', 4),
+    getPublicRssItems('https://www.petsplusmag.com/feed/', 'Pet industry', 'PETS+', 3),
+  ]);
+  return feeds
+    .flatMap((feed) => (feed.status === 'fulfilled' ? feed.value : []))
+    .filter((item, index, items) => items.findIndex((other) => other.link === item.link || other.title === item.title) === index)
+    .slice(0, 6);
+}
+
 async function getAnimalStories() {
+  try {
+    const rssStories = await getAnimalStoriesFromRss();
+    if (rssStories.length) return rssStories;
+  } catch {
+    // Public RSS keeps this section no-key; GDELT/Google remain backups.
+  }
   try {
     const url = new URL('https://api.gdeltproject.org/api/v2/doc/doc');
     url.searchParams.set('query', '"animal rescue" OR "pet adoption" OR wildlife OR "animal shelter"');
@@ -383,7 +419,7 @@ export async function onRequest({ request, env }) {
 
   if (stories.status === 'fulfilled' && stories.value.length) {
     result.stories = stories.value;
-    result.status.news = stories.value.some((story) => story.source) ? 'live_google_news' : 'live_gdelt';
+    result.status.news = stories.value.some((story) => story.source) ? 'live_public_rss' : 'live_gdelt';
   }
   if (events.status === 'fulfilled' && events.value?.length) {
     result.events = events.value;

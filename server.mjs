@@ -443,7 +443,43 @@ async function getLocalGoogleNewsItems(query, type, limit = 6) {
   });
 }
 
+async function getLocalPublicRssItems(url, type, sourceDefault, limit = 6) {
+  const xml = await fetchFeedText(url);
+  return [...xml.matchAll(/<item\b[\s\S]*?<\/item>/gi)].slice(0, limit).map((match) => {
+    const item = match[0];
+    const rawDescription = feedTagValue(item, 'description') || feedTagValue(item, 'content:encoded');
+    const title = cleanText(feedTagValue(item, 'title'), 130);
+    const source = cleanText(feedTagValue(item, 'source') || sourceDefault, 70);
+    return {
+      title: title || 'Animal story',
+      type,
+      source,
+      summary: cleanText(stripFeedHtml(rawDescription) || `Current item from ${source}. Open the source for full details before sharing.`, 190),
+      date: formatFeedDate(feedTagValue(item, 'pubDate')),
+      link: feedTagValue(item, 'link') || '#',
+    };
+  }).filter((item) => item.title && item.link);
+}
+
+async function getLocalAnimalStoriesFromRss() {
+  const feeds = await Promise.allSettled([
+    getLocalPublicRssItems('https://www.aspca.org/rss.xml', 'Animal welfare', 'ASPCA', 4),
+    getLocalPublicRssItems('https://www.akc.org/expert-advice/feed/', 'Pet care note', 'American Kennel Club', 4),
+    getLocalPublicRssItems('https://www.petsplusmag.com/feed/', 'Pet industry', 'PETS+', 3),
+  ]);
+  return feeds
+    .flatMap((feed) => (feed.status === 'fulfilled' ? feed.value : []))
+    .filter((item, index, items) => items.findIndex((other) => other.link === item.link || other.title === item.title) === index)
+    .slice(0, 6);
+}
+
 async function getLocalAnimalStories() {
+  try {
+    const rssStories = await getLocalAnimalStoriesFromRss();
+    if (rssStories.length) return rssStories;
+  } catch {
+    // Public RSS keeps this section no-key; GDELT/Google remain backups.
+  }
   try {
     const url = new URL('https://api.gdeltproject.org/api/v2/doc/doc');
     url.searchParams.set('query', '"animal rescue" OR "pet adoption" OR wildlife OR "animal shelter"');
@@ -537,7 +573,7 @@ async function getSocialFeed(response) {
   ]);
   if (stories.status === 'fulfilled' && stories.value.length) {
     feed.stories = stories.value;
-    feed.status.news = stories.value.some((story) => story.source) ? 'live_google_news' : 'live_gdelt';
+    feed.status.news = stories.value.some((story) => story.source) ? 'live_public_rss' : 'live_gdelt';
   }
   if (events.status === 'fulfilled' && events.value?.length) {
     feed.events = events.value;
