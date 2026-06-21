@@ -155,7 +155,7 @@ function renderFeed(feed, fromLiveEndpoint = false) {
       day: 'numeric',
       year: 'numeric',
     }).format(new Date(feed.updatedAt || Date.now()));
-    const status = feed.status?.events === 'live_google_news'
+    const status = ['live_event_calendar', 'live_google_news'].includes(feed.status?.events)
       ? 'Current events'
       : feed.status?.places === 'live_openstreetmap' || feed.status?.news === 'live_gdelt'
         ? 'Partly live'

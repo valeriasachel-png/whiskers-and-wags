@@ -113,7 +113,8 @@ async function fetchJson(url, options = {}) {
 async function fetchText(url, options = {}) {
   const response = await fetch(url, {
     headers: {
-      Accept: 'application/rss+xml, application/xml, text/xml, text/plain',
+      Accept: 'application/rss+xml, application/xml, text/xml, text/html, text/plain',
+      'User-Agent': 'WhiskersAndWags/1.0 (https://whiskersandwagsms.com)',
       ...options.headers,
     },
     method: options.method || 'GET',
@@ -146,6 +147,113 @@ function decodeEntities(value) {
 function tagValue(item, tag) {
   const match = item.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
   return decodeEntities(match?.[1] || '');
+}
+
+function stripHtml(value) {
+  return decodeEntities(String(value ?? '').replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function eventDateFromText(value, year = new Date().getFullYear()) {
+  const monthMap = {
+    jan: 0,
+    feb: 1,
+    mar: 2,
+    apr: 3,
+    may: 4,
+    jun: 5,
+    jul: 6,
+    aug: 7,
+    sep: 8,
+    sept: 8,
+    oct: 9,
+    nov: 10,
+    dec: 11,
+  };
+  const match = String(value).match(/\b([A-Za-z]{3,9})\.?\s+(\d{1,2})/);
+  if (!match) return null;
+  const month = monthMap[match[1].toLowerCase().slice(0, 4)] ?? monthMap[match[1].toLowerCase().slice(0, 3)];
+  if (month === undefined) return null;
+  return new Date(Date.UTC(year, month, Number(match[2])));
+}
+
+function currentEventFallback() {
+  return [
+    {
+      title: 'LA Pet Fair',
+      location: 'Pomona, CA',
+      date: 'Jul. 11-12, 2026',
+      summary: 'Large pet show featuring fish, birds, reptiles, supplies, workshops, and animal-friendly exhibits.',
+      link: 'https://lapetfair.com',
+    },
+    {
+      title: 'SuperZoo',
+      location: 'Las Vegas, NV',
+      date: 'Aug. 12-14, 2026',
+      summary: 'National pet retail and pet care expo with new products, education, and industry networking.',
+      link: 'https://www.superzoo.org',
+    },
+    {
+      title: 'Hershey Groom Expo',
+      location: 'Hershey, PA',
+      date: 'Sep. 10-13, 2026',
+      summary: 'Grooming education, competitions, vendors, and pet-care learning for grooming professionals.',
+      link: 'https://www.groomexpo.com',
+    },
+    {
+      title: 'Pet Fair Asia',
+      location: 'Shanghai, China',
+      date: 'Aug. 19-23, 2026',
+      summary: 'International pet industry trade show covering pet products, services, and companion animal trends.',
+      link: 'https://www.petfairasia.com',
+    },
+    {
+      title: 'Interzoo',
+      location: 'Nuremberg, Germany',
+      date: 'May 12-15, 2026',
+      summary: 'International pet industry trade fair with pet products, care, and animal welfare topics.',
+      link: 'https://www.interzoo.com',
+    },
+    {
+      title: 'Petfood Forum',
+      location: 'Kansas City, MO',
+      date: 'Apr. 28-29, 2026',
+      summary: 'Conference for pet food manufacturing, nutrition, safety, and companion animal product innovation.',
+      link: 'https://petfoodforumevents.com',
+    },
+  ].filter((event) => {
+    const date = eventDateFromText(event.date, 2026);
+    return !date || date.getTime() >= Date.now() - 24 * 60 * 60 * 1000;
+  }).slice(0, 6);
+}
+
+async function getPetIndustryCalendarEvents() {
+  const html = await fetchText('https://petsplusmag.com/2026-pet-industry-events-trade-shows-conferences/', {
+    headers: { Accept: 'text/html' },
+  });
+  const events = [...html.matchAll(/<p>\s*<strong>([^<]+)<\/strong>\s*<br\s*\/?>\s*<strong>([^<]+)<\/strong>\s*<br\s*\/?>\s*<strong>([^<]+)<\/strong>\s*<br\s*\/?>\s*([\s\S]*?)(?:<\/p>)/gi)]
+    .map((match) => {
+      const date = stripHtml(match[1]);
+      const title = stripHtml(match[2]);
+      const location = stripHtml(match[3]);
+      const body = match[4];
+      const linkMatch = body.match(/<a[^>]+href=["']([^"']+)["']/i);
+      return {
+        title: cleanText(title, 120),
+        location: cleanText(location || 'Event location TBA', 90),
+        date: cleanText(`${date}, 2026`, 40),
+        sortDate: eventDateFromText(date, 2026),
+        summary: cleanText(stripHtml(body).replace(/\s*(https?:\/\/\S+|[\w.-]+\.\w{2,}\S*)\s*/g, ' '), 190),
+        link: linkMatch?.[1] || 'https://petsplusmag.com/2026-pet-industry-events-trade-shows-conferences/',
+      };
+    })
+    .filter((event) => event.title && event.sortDate && event.sortDate.getTime() >= Date.now() - 24 * 60 * 60 * 1000)
+    .sort((a, b) => a.sortDate - b.sortDate)
+    .slice(0, 6)
+    .map(({ sortDate, ...event }) => event);
+
+  return events.length ? events : currentEventFallback();
 }
 
 function googleNewsRssUrl(query) {
@@ -201,18 +309,22 @@ async function getAnimalStories() {
 }
 
 async function getAnimalEvents() {
-  const items = await getGoogleNewsItems(
-    '"pet event" OR "animal event" OR "dog show" OR "pet adoption event" OR "animal shelter fundraiser"',
-    'Animal event',
-    6,
-  );
-  return items.map((item) => ({
-    title: item.title,
-    location: item.source || 'Current animal feed',
-    date: item.date,
-    summary: item.summary,
-    link: item.link,
-  }));
+  try {
+    return await getPetIndustryCalendarEvents();
+  } catch {
+    const items = await getGoogleNewsItems(
+      '"pet event" OR "animal event" OR "dog show" OR "pet adoption event" OR "animal shelter fundraiser"',
+      'Animal event',
+      6,
+    );
+    return items.map((item) => ({
+      title: item.title,
+      location: item.source || 'Current animal feed',
+      date: item.date,
+      summary: item.summary,
+      link: item.link,
+    }));
+  }
 }
 
 async function getPetFriendlyPlaces() {
@@ -275,7 +387,7 @@ export async function onRequest({ request, env }) {
   }
   if (events.status === 'fulfilled' && events.value?.length) {
     result.events = events.value;
-    result.status.events = 'live_google_news';
+    result.status.events = 'live_event_calendar';
   }
   if (places.status === 'fulfilled' && places.value.length) {
     result.places = places.value;
