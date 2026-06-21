@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check functions/_middleware.js && node --check functions/api/requests.js && node --check functions/api/reviews.js && node --check functions/api/intake.js && node --check functions/api/events.js && node --check shared.js && node --check request.js && node --check client-intake.js && node --check picks.js && node --check gallery.js && node --check social-events.js && node --check about.js"
+    "check": "node --check server.mjs && node --check functions/_middleware.js && node --check functions/api/requests.js && node --check functions/api/reviews.js && node --check functions/api/intake.js && node --check functions/api/events.js && node --check functions/api/social-feed.js && node --check shared.js && node --check request.js && node --check client-intake.js && node --check picks.js && node --check gallery.js && node --check social-events.js"
   },
   "engines": {
     "node": ">=18"

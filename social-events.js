@@ -1,5 +1,5 @@
-// SOCIAL & EVENTS CONTENT: Replace these starter entries with real stories, event feeds, and verified local places.
-const animalStories = [
+// SOCIAL & EVENTS CONTENT: Starter entries are used only when a free live feed is unavailable.
+const fallbackStories = [
   {
     title: 'Rescue wins and adoption updates',
     type: 'Community story',
@@ -20,28 +20,28 @@ const animalStories = [
   },
 ];
 
-const starterEvents = [
+const fallbackEvents = [
   {
     title: 'Global pet adoption awareness days',
     location: 'Worldwide',
     date: 'Seasonal',
-    summary: 'Use this card for adoption drives, shelter campaigns, and animal welfare awareness dates.',
+    summary: 'Add the free Ticketmaster developer key to unlock live pet and animal event listings.',
   },
   {
     title: 'Dog walks, fun runs, and charity events',
     location: 'Worldwide',
-    date: 'Daily feed ready',
-    summary: 'This slot is built for live event sources once an API or approved event calendar is connected.',
+    date: 'Live feed ready',
+    summary: 'This slot is wired for Ticketmaster Discovery API results once the key is connected.',
   },
   {
     title: 'Pet expos and animal education events',
     location: 'United States and beyond',
-    date: 'Updated manually for now',
-    summary: 'List expos, training events, reptile shows, cat shows, and family-friendly animal events.',
+    date: 'Ready to update',
+    summary: 'Use this for expos, adoption events, animal shows, rescue fundraisers, and educational events.',
   },
 ];
 
-const petFriendlyPlaces = [
+const fallbackPlaces = [
   {
     title: 'Pet-friendly patios',
     area: 'Madison, Flowood, Ridgeland',
@@ -55,7 +55,7 @@ const petFriendlyPlaces = [
   {
     title: 'Pet supply stops',
     area: 'Nearby communities',
-    note: 'Use this card for trusted local stores, grooming stops, and emergency supply options.',
+    note: 'Trusted local stores and supply stops can be featured here as they are verified.',
   },
   {
     title: 'Travel-friendly public spots',
@@ -75,36 +75,61 @@ const petTips = [
   ['Unique pets', 'The more unusual the pet, the more useful a simple daily checklist becomes.'],
 ];
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
+function safeUrl(value, fallback = '#') {
+  try {
+    const url = new URL(value, window.location.origin);
+    return ['http:', 'https:'].includes(url.protocol) || url.origin === window.location.origin ? url.href : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 function cardTemplate(item) {
+  const link = safeUrl(item.link, '/gallery');
+  const external = link.startsWith('http') && !link.startsWith(window.location.origin);
   return `
     <article class="social-card">
-      <span>${item.type}</span>
-      <h3>${item.title}</h3>
-      <p>${item.summary}</p>
-      <a href="${item.link}" data-track="social_story_click">Read or share</a>
+      <span>${escapeHtml(item.type || 'Animal story')}</span>
+      <h3>${escapeHtml(item.title)}</h3>
+      <p>${escapeHtml(item.summary)}</p>
+      <a href="${escapeHtml(link)}" ${external ? 'target="_blank" rel="noopener"' : ''} data-track="social_story_click">Read story</a>
     </article>
   `;
 }
 
 function eventTemplate(item) {
+  const title = escapeHtml(item.title);
+  const link = item.link ? safeUrl(item.link) : '';
   return `
     <article class="event-card">
       <div>
-        <span>${item.date}</span>
-        <h3>${item.title}</h3>
-        <p>${item.summary}</p>
+        <span>${escapeHtml(item.date || 'Date TBA')}</span>
+        <h3>${link ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener" data-track="social_event_click">${title}</a>` : title}</h3>
+        <p>${escapeHtml(item.summary)}</p>
       </div>
-      <strong>${item.location}</strong>
+      <strong>${escapeHtml(item.location || 'Location TBA')}</strong>
     </article>
   `;
 }
 
 function placeTemplate(item) {
+  const title = escapeHtml(item.title);
+  const link = item.link ? safeUrl(item.link) : '';
   return `
     <article class="pet-place-card">
-      <span>${item.area}</span>
-      <h3>${item.title}</h3>
-      <p>${item.note}</p>
+      <span>${escapeHtml(item.area || 'Jackson metro')}</span>
+      <h3>${link ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener" data-track="pet_place_click">${title}</a>` : title}</h3>
+      <p>${escapeHtml(item.note)}</p>
     </article>
   `;
 }
@@ -112,22 +137,46 @@ function placeTemplate(item) {
 function tipTemplate([petType, tip]) {
   return `
     <article class="tip-card">
-      <strong>${petType}</strong>
-      <p>${tip}</p>
+      <strong>${escapeHtml(petType)}</strong>
+      <p>${escapeHtml(tip)}</p>
     </article>
   `;
 }
 
-document.querySelector('#animal-stories').innerHTML = animalStories.map(cardTemplate).join('');
-document.querySelector('#event-list').innerHTML = starterEvents.map(eventTemplate).join('');
-document.querySelector('#pet-friendly-places').innerHTML = petFriendlyPlaces.map(placeTemplate).join('');
-document.querySelector('#pet-tips').innerHTML = petTips.map(tipTemplate).join('');
+function renderFeed(feed, fromLiveEndpoint = false) {
+  document.querySelector('#animal-stories').innerHTML = (feed.stories || fallbackStories).map(cardTemplate).join('');
+  document.querySelector('#event-list').innerHTML = (feed.events || fallbackEvents).map(eventTemplate).join('');
+  document.querySelector('#pet-friendly-places').innerHTML = (feed.places || fallbackPlaces).map(placeTemplate).join('');
 
-const updated = document.querySelector('#events-updated');
-if (updated) {
-  updated.textContent = `Starter feed checked ${new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date())}`;
+  const updated = document.querySelector('#events-updated');
+  if (updated) {
+    const date = new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(feed.updatedAt || Date.now()));
+    const status = feed.status?.events === 'live_ticketmaster'
+      ? 'Live events'
+      : feed.status?.places === 'live_openstreetmap' || feed.status?.news === 'live_gdelt'
+        ? 'Partly live'
+        : fromLiveEndpoint
+          ? 'Feed fallback'
+          : 'Starter feed';
+    updated.textContent = `${status} checked ${date}`;
+  }
 }
+
+async function hydrateLiveFeed() {
+  renderFeed({ stories: fallbackStories, events: fallbackEvents, places: fallbackPlaces });
+  try {
+    const response = await fetch('/api/social-feed', { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error('Feed unavailable');
+    const feed = await response.json();
+    renderFeed(feed, true);
+  } catch {
+    renderFeed({ stories: fallbackStories, events: fallbackEvents, places: fallbackPlaces });
+  }
+}
+
+document.querySelector('#pet-tips').innerHTML = petTips.map(tipTemplate).join('');
+hydrateLiveFeed();
