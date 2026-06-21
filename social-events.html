@@ -47,7 +47,7 @@
           <aside class="feature-card social-calendar-card">
             <span class="gallery-label">Daily Animal Pulse</span>
             <h2>Connected to free feeds.</h2>
-            <p>Animal news and local places can update through free public sources. Live worldwide events turn on as soon as the free Ticketmaster key is added.</p>
+            <p>Animal news, current animal happenings, and local pet-friendly places update through free public sources with no API key required.</p>
             <div class="calendar-mini" aria-label="Social page sections">
               <span>Stories</span>
               <span>Events</span>
@@ -63,9 +63,9 @@
           <div class="section-heading">
             <div class="eyebrow">Cute &amp; Cool Animal News</div>
             <h2 id="animal-stories-title">Stories worth smiling over</h2>
-            <p>Live animal headlines are pulled from GDELT when available, with polished backup cards if the source is busy.</p>
+            <p>Current animal headlines are pulled from free public news feeds, with polished backup cards if a source is busy.</p>
           </div>
-          <!-- ANIMAL STORIES: Live cards load from /api/social-feed using GDELT. -->
+          <!-- ANIMAL STORIES: Current no-key cards load from /api/social-feed using free public news feeds. -->
           <div class="social-card-grid" id="animal-stories"></div>
         </div>
       </section>
@@ -76,11 +76,11 @@
             <div>
               <div class="eyebrow">Animal &amp; Pet Events</div>
               <h2 id="events-title">Upcoming happenings to watch</h2>
-              <p>Live Ticketmaster Discovery results appear here after the free API key is added in Cloudflare.</p>
+              <p>Current animal happenings are pulled from a no-key news feed, then linked back to the source for details.</p>
             </div>
             <span class="data-note" id="events-updated">Starter feed</span>
           </div>
-          <!-- EVENT FEED: Live cards load from /api/social-feed using Ticketmaster when configured. -->
+          <!-- EVENT FEED: Current no-key cards load from /api/social-feed using Google News RSS. -->
           <div class="event-list" id="event-list"></div>
         </div>
       </section>

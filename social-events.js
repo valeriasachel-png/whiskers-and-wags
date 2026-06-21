@@ -25,13 +25,13 @@ const fallbackEvents = [
     title: 'Global pet adoption awareness days',
     location: 'Worldwide',
     date: 'Seasonal',
-    summary: 'Add the free Ticketmaster developer key to unlock live pet and animal event listings.',
+    summary: 'A fallback slot for adoption drives, shelter campaigns, and animal welfare awareness dates.',
   },
   {
     title: 'Dog walks, fun runs, and charity events',
     location: 'Worldwide',
-    date: 'Live feed ready',
-    summary: 'This slot is wired for Ticketmaster Discovery API results once the key is connected.',
+    date: 'Current feed backup',
+    summary: 'A backup slot for public dog walks, charity events, shelter fundraisers, and animal-friendly outings.',
   },
   {
     title: 'Pet expos and animal education events',
@@ -155,8 +155,8 @@ function renderFeed(feed, fromLiveEndpoint = false) {
       day: 'numeric',
       year: 'numeric',
     }).format(new Date(feed.updatedAt || Date.now()));
-    const status = feed.status?.events === 'live_ticketmaster'
-      ? 'Live events'
+    const status = feed.status?.events === 'live_google_news'
+      ? 'Current events'
       : feed.status?.places === 'live_openstreetmap' || feed.status?.news === 'live_gdelt'
         ? 'Partly live'
         : fromLiveEndpoint

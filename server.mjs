@@ -172,12 +172,12 @@ function publicReview(record) {
   };
 }
 
-function socialFallbackFeed(ticketmasterConfigured = false) {
+function socialFallbackFeed() {
   return {
     updatedAt: new Date().toISOString(),
     status: {
       news: 'fallback',
-      events: ticketmasterConfigured ? 'fallback' : 'needs_ticketmaster_key',
+      events: 'fallback',
       places: 'fallback',
     },
     stories: [
@@ -205,13 +205,13 @@ function socialFallbackFeed(ticketmasterConfigured = false) {
         title: 'Global pet adoption awareness days',
         location: 'Worldwide',
         date: 'Seasonal',
-        summary: 'Add the free Ticketmaster developer key to unlock live pet and animal event listings.',
+        summary: 'A fallback slot for adoption drives, shelter campaigns, and animal welfare awareness dates.',
       },
       {
         title: 'Dog walks, fun runs, and charity events',
         location: 'Worldwide',
-        date: 'Live feed ready',
-        summary: 'This slot is wired for Ticketmaster Discovery API results once the key is connected.',
+        date: 'Current feed backup',
+        summary: 'A backup slot for public dog walks, charity events, shelter fundraisers, and animal-friendly outings.',
       },
       {
         title: 'Pet expos and animal education events',
@@ -269,6 +269,18 @@ async function fetchFeedJson(url, options = {}) {
   return response.json();
 }
 
+async function fetchFeedText(url, options = {}) {
+  const response = await fetch(url, {
+    headers: {
+      Accept: 'application/rss+xml, application/xml, text/xml, text/plain',
+      ...options.headers,
+    },
+    method: options.method || 'GET',
+  });
+  if (!response.ok) throw new Error(`Text fetch failed ${response.status}`);
+  return response.text();
+}
+
 async function fetchOverpassJson(url) {
   const response = await fetch(url, {
     headers: {
@@ -279,43 +291,85 @@ async function fetchOverpassJson(url) {
   return response.json();
 }
 
-async function getLocalAnimalStories() {
-  const url = new URL('https://api.gdeltproject.org/api/v2/doc/doc');
-  url.searchParams.set('query', '"animal rescue" OR "pet adoption" OR wildlife OR "animal shelter"');
-  url.searchParams.set('mode', 'ArtList');
-  url.searchParams.set('format', 'json');
-  url.searchParams.set('maxrecords', '6');
-  url.searchParams.set('sort', 'DateDesc');
-  const data = await fetchFeedJson(url);
-  return (data.articles || []).slice(0, 6).map((article) => ({
-    title: cleanText(article.title, 120) || 'Animal story',
-    type: cleanText(article.domain, 60) || 'Animal news',
-    summary: cleanText(article.seendate ? `Seen ${formatFeedDate(article.seendate)}. Tap through to read the full source story.` : 'Tap through to read the full source story.', 190),
-    link: article.url || '#',
-  }));
+function decodeFeedEntities(value) {
+  return String(value ?? '')
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
 }
 
-async function getLocalAnimalEvents(apiKey) {
-  if (!apiKey || apiKey.includes('your_ticketmaster')) return null;
-  const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
-  url.searchParams.set('apikey', apiKey);
-  url.searchParams.set('keyword', 'pet dog cat animal adoption rescue expo');
-  url.searchParams.set('size', '6');
-  url.searchParams.set('sort', 'date,asc');
-  const data = await fetchFeedJson(url);
-  const events = data?._embedded?.events || [];
-  return events.slice(0, 6).map((event) => {
-    const venue = event?._embedded?.venues?.[0];
-    const city = venue?.city?.name;
-    const state = venue?.state?.stateCode || venue?.country?.countryCode;
+function feedTagValue(item, tag) {
+  const match = item.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+  return decodeFeedEntities(match?.[1] || '');
+}
+
+function googleNewsRssUrl(query) {
+  const url = new URL('https://news.google.com/rss/search');
+  url.searchParams.set('q', query);
+  url.searchParams.set('hl', 'en-US');
+  url.searchParams.set('gl', 'US');
+  url.searchParams.set('ceid', 'US:en');
+  return url;
+}
+
+async function getLocalGoogleNewsItems(query, type, limit = 6) {
+  const xml = await fetchFeedText(googleNewsRssUrl(query));
+  return [...xml.matchAll(/<item\b[\s\S]*?<\/item>/gi)].slice(0, limit).map((match) => {
+    const item = match[0];
+    const title = cleanText(feedTagValue(item, 'title').replace(/\s+-\s+[^-]+$/, ''), 130);
+    const source = cleanText(feedTagValue(item, 'source') || 'Google News', 70);
+    const published = feedTagValue(item, 'pubDate');
     return {
-      title: cleanText(event.name, 120) || 'Animal event',
-      location: cleanText([city, state].filter(Boolean).join(', ') || venue?.name || 'Location TBA', 90),
-      date: formatFeedDate(event.dates?.start?.localDate || event.dates?.start?.dateTime),
-      summary: cleanText(event.info || event.pleaseNote || 'Tap through for event details, availability, and current rules.', 190),
-      link: event.url || '',
+      title: title || 'Animal update',
+      type,
+      source,
+      summary: cleanText(`Current item from ${source}. Open the source for full details before sharing.`, 190),
+      date: formatFeedDate(published),
+      location: 'Current animal feed',
+      link: feedTagValue(item, 'link') || '#',
     };
   });
+}
+
+async function getLocalAnimalStories() {
+  try {
+    const url = new URL('https://api.gdeltproject.org/api/v2/doc/doc');
+    url.searchParams.set('query', '"animal rescue" OR "pet adoption" OR wildlife OR "animal shelter"');
+    url.searchParams.set('mode', 'ArtList');
+    url.searchParams.set('format', 'json');
+    url.searchParams.set('maxrecords', '6');
+    url.searchParams.set('sort', 'DateDesc');
+    const data = await fetchFeedJson(url);
+    const stories = (data.articles || []).slice(0, 6).map((article) => ({
+      title: cleanText(article.title, 120) || 'Animal story',
+      type: cleanText(article.domain, 60) || 'Animal news',
+      summary: cleanText(article.seendate ? `Seen ${formatFeedDate(article.seendate)}. Tap through to read the full source story.` : 'Tap through to read the full source story.', 190),
+      link: article.url || '#',
+    }));
+    if (stories.length) return stories;
+  } catch {
+    // GDELT is free but can throttle. Google News RSS keeps this section current without a key.
+  }
+  return getLocalGoogleNewsItems('animal rescue OR pet adoption OR wildlife OR animal shelter', 'Animal news');
+}
+
+async function getLocalAnimalEvents() {
+  const items = await getLocalGoogleNewsItems(
+    '"pet event" OR "animal event" OR "dog show" OR "pet adoption event" OR "animal shelter fundraiser"',
+    'Animal event',
+    6,
+  );
+  return items.map((item) => ({
+    title: item.title,
+    location: item.source || 'Current animal feed',
+    date: item.date,
+    summary: item.summary,
+    link: item.link,
+  }));
 }
 
 async function getLocalPetFriendlyPlaces() {
@@ -359,23 +413,23 @@ async function getSocialFeed(response) {
   if (localSocialFeedCache && now - localSocialFeedCache.time < 15 * 60 * 1000) {
     return json(response, 200, localSocialFeedCache.feed);
   }
-  const fallback = socialFallbackFeed(Boolean(process.env.TICKETMASTER_API_KEY));
+  const fallback = socialFallbackFeed();
   const feed = {
     ...fallback,
     status: { ...fallback.status },
   };
   const [stories, events, places] = await Promise.allSettled([
     getLocalAnimalStories(),
-    getLocalAnimalEvents(process.env.TICKETMASTER_API_KEY),
+    getLocalAnimalEvents(),
     getLocalPetFriendlyPlaces(),
   ]);
   if (stories.status === 'fulfilled' && stories.value.length) {
     feed.stories = stories.value;
-    feed.status.news = 'live_gdelt';
+    feed.status.news = stories.value.some((story) => story.source) ? 'live_google_news' : 'live_gdelt';
   }
   if (events.status === 'fulfilled' && events.value?.length) {
     feed.events = events.value;
-    feed.status.events = 'live_ticketmaster';
+    feed.status.events = 'live_google_news';
   }
   if (places.status === 'fulfilled' && places.value.length) {
     feed.places = places.value;
