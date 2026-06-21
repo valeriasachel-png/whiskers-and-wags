@@ -262,6 +262,14 @@ spotlightTargets.forEach((element) => {
   });
 });
 
+document.querySelectorAll('.button, .amazon-link, .category-filter, .social-section-nav a, .calendar-mini a').forEach((button) => {
+  button.addEventListener('pointermove', (event) => {
+    const rect = button.getBoundingClientRect();
+    button.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+    button.style.setProperty('--my', `${event.clientY - rect.top}px`);
+  });
+});
+
 // CONVERSION TRACKING: privacy-friendly click events only, with no form details stored in the browser.
 function trackConversion(eventName, target = '') {
   const payload = JSON.stringify({

@@ -15,9 +15,9 @@
     <meta property="og:image" content="https://whiskersandwagsms.com/assets/hero-pets.jpg">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/styles.css?v=20260621-4">
-    <script src="/shared.js?v=20260621-4" defer></script>
-    <script src="/social-events.js?v=20260621-5" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260621-5">
+    <script src="/shared.js?v=20260621-5" defer></script>
+    <script src="/social-events.js?v=20260621-6" defer></script>
   </head>
   <body class="social-page">
     <div data-site-header></div>
@@ -33,10 +33,15 @@
             <div class="eyebrow">Community Journal</div>
             <h1><span>Pet stories,</span> <span>sweet finds,</span> <span>and animal happenings.</span></h1>
             <p>A friendly Whiskers &amp; Wags hub for pet of the week, cute animal stories, pet-friendly local places, worldwide animal events, and useful care tips.</p>
-            <div class="social-hero-badges" aria-label="Live social feed sources">
-              <span>Live animal stories</span>
-              <span>Upcoming events</span>
-              <span>Local pet-friendly places</span>
+            <div class="social-hero-actions">
+              <a class="button" href="/request" data-track="cta_social_request_hero">Request Care</a>
+              <a class="button button-secondary" href="#animal-stories-title" data-scroll-target="stories" data-track="cta_social_browse">Browse the Journal</a>
+            </div>
+            <div class="social-section-nav" aria-label="Jump to social page sections">
+              <a href="#stories" data-track="jump_social_stories">Stories</a>
+              <a href="#events" data-track="jump_social_events">Events</a>
+              <a href="#local-places" data-track="jump_social_places">Local Places</a>
+              <a href="#pet-tips-section" data-track="jump_social_tips">Tips</a>
             </div>
           </div>
         </div>
@@ -58,24 +63,24 @@
           </article>
           <aside class="feature-card social-calendar-card">
             <span class="gallery-label">Daily Animal Pulse</span>
-            <h2>Connected to free feeds.</h2>
-            <p>Animal news, current animal happenings, and local pet-friendly places update through free public sources with no API key required.</p>
-            <div class="feed-orbit" aria-hidden="true">
-              <span>RSS</span>
-              <span>Events</span>
-              <span>Maps</span>
+            <h2>Fresh, useful, and easy to explore.</h2>
+            <p>Animal stories, pet events, and local places update through public sources so visitors get something useful, not just a static brochure.</p>
+            <div class="source-stack" aria-label="Current social page sources">
+              <span><strong>Stories</strong> Public RSS feeds</span>
+              <span><strong>Events</strong> Public event calendar</span>
+              <span><strong>Places</strong> OpenStreetMap data</span>
             </div>
-            <div class="calendar-mini" aria-label="Social page sections">
-              <span>Stories</span>
-              <span>Events</span>
-              <span>Local Places</span>
-              <span>Tips</span>
+            <div class="calendar-mini" aria-label="Social page section shortcuts">
+              <a href="#stories" data-track="pulse_stories">Stories</a>
+              <a href="#events" data-track="pulse_events">Events</a>
+              <a href="#local-places" data-track="pulse_places">Local Places</a>
+              <a href="#pet-tips-section" data-track="pulse_tips">Tips</a>
             </div>
           </aside>
         </div>
       </section>
 
-      <section class="section section-soft social-news-section" aria-labelledby="animal-stories-title">
+      <section class="section section-soft social-news-section" id="stories" aria-labelledby="animal-stories-title">
         <div class="container">
           <div class="section-heading">
             <div class="eyebrow">Cute &amp; Cool Animal News</div>
@@ -87,7 +92,7 @@
         </div>
       </section>
 
-      <section class="section social-events-section" aria-labelledby="events-title">
+      <section class="section social-events-section" id="events" aria-labelledby="events-title">
         <div class="container">
           <div class="section-heading split-heading">
             <div>
@@ -102,7 +107,7 @@
         </div>
       </section>
 
-      <section class="section section-soft social-places-section" aria-labelledby="pet-friendly-title">
+      <section class="section section-soft social-places-section" id="local-places" aria-labelledby="pet-friendly-title">
         <div class="container">
           <div class="section-heading">
             <div class="eyebrow">Pet-Friendly Around Town</div>
@@ -114,10 +119,10 @@
         </div>
       </section>
 
-      <section class="section tips-footer-section social-tips-section" aria-labelledby="tips-title">
+      <section class="section tips-footer-section social-tips-section" id="pet-tips-section" aria-labelledby="tips-title">
         <div class="container">
           <div class="section-heading">
-            <div class="eyebrow">Pet Tips Footer</div>
+            <div class="eyebrow">Care Notes</div>
             <h2 id="tips-title">Little care notes for all kinds of pets</h2>
             <p>Short, useful reminders for dogs, cats, birds, reptiles, small mammals, fish, and the wonderfully unusual pets too.</p>
           </div>
