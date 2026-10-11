@@ -1281,8 +1281,9 @@ async function handleAdmin(request, response, url) {
     } catch {
       return json(response, 400, { message: 'Please submit valid login details.' });
     }
-    if (String(input.password || '') !== localAdminPassword()) {
-      return json(response, 401, { message: 'That password is not correct.' });
+    const username = process.env.ADMIN_USERNAME || 'OBANDO26';
+    if (String(input.username || '').trim() !== username || String(input.password || '') !== localAdminPassword()) {
+      return json(response, 401, { message: 'That username or password is not correct.' });
     }
     response.writeHead(200, {
       'Content-Type': 'application/json; charset=utf-8',

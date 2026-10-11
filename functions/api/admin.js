@@ -218,8 +218,9 @@ export async function onRequest({ request, env }) {
 
   if (request.method === 'POST' && action === 'login') {
     const input = await request.json().catch(() => ({}));
-    if (String(input.password || '') !== String(env.ADMIN_PASSWORD)) {
-      return json(401, { message: 'That password is not correct.' });
+    const username = String(env.ADMIN_USERNAME || 'OBANDO26');
+    if (String(input.username || '').trim() !== username || String(input.password || '') !== String(env.ADMIN_PASSWORD)) {
+      return json(401, { message: 'That username or password is not correct.' });
     }
     const session = await makeSession(env);
     return json(200, { authenticated: true }, {

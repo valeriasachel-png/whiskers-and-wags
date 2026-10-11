@@ -68,6 +68,7 @@ For production, add these Cloudflare Pages variables and bindings:
 
 ```text
 ADMIN_PASSWORD        Secret value. Use a strong password.
+ADMIN_USERNAME        Optional text value. Defaults to OBANDO26.
 ADMIN_SESSION_SECRET  Secret value. Use a long random string.
 SITE_CONTENT_KV       Cloudflare KV namespace binding for editable site content.
 ```

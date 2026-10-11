@@ -7,7 +7,7 @@
     <title>Admin Dashboard | Whiskers &amp; Wags</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/styles.css?v=20261005-1">
-    <script src="/admin.js?v=20261005-1" defer></script>
+    <script src="/admin.js?v=20261011-1" defer></script>
   </head>
   <body class="admin-page">
     <main class="admin-shell">
@@ -16,6 +16,8 @@
         <h1>Sign in to edit the website.</h1>
         <p>Use this private dashboard to update announcements, home copy, gallery photos, featured notes, and social page tips.</p>
         <form id="login-form">
+          <label for="admin-username">Username</label>
+          <input id="admin-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
           <label for="admin-password">Admin password</label>
           <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
           <button class="button" type="submit">Sign In</button>
