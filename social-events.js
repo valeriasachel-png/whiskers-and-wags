@@ -75,6 +75,8 @@ const petTips = [
   ['Unique pets', 'The more unusual the pet, the more useful a simple daily checklist becomes.'],
 ];
 
+let backendTips = [];
+
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (character) => ({
     '&': '&amp;',
@@ -143,6 +145,14 @@ function tipTemplate([petType, tip]) {
   `;
 }
 
+function allTips() {
+  return [...petTips, ...backendTips.map((tip) => [tip.petType, tip.tip])];
+}
+
+function renderTips() {
+  document.querySelector('#pet-tips').innerHTML = allTips().map(tipTemplate).join('');
+}
+
 function renderFeed(feed, fromLiveEndpoint = false) {
   document.querySelector('#animal-stories').innerHTML = (feed.stories || fallbackStories).map(cardTemplate).join('');
   document.querySelector('#event-list').innerHTML = (feed.events || fallbackEvents).map(eventTemplate).join('');
@@ -179,7 +189,7 @@ async function hydrateLiveFeed() {
   }
 }
 
-document.querySelector('#pet-tips').innerHTML = petTips.map(tipTemplate).join('');
+renderTips();
 activateSectionNav();
 
 function hydrateDynamicMotion() {
@@ -221,6 +231,15 @@ function hydrateDynamicMotion() {
 }
 
 hydrateLiveFeed();
+
+function applyBackendSocialContent(content) {
+  backendTips = Array.isArray(content.social?.tips) ? content.social.tips.filter((tip) => tip.petType && tip.tip) : [];
+  renderTips();
+  hydrateDynamicMotion();
+}
+
+window.addEventListener('whiskers:content', (event) => applyBackendSocialContent(event.detail || {}));
+if (window.whiskersContent) applyBackendSocialContent(window.whiskersContent);
 
 function activateSectionNav() {
   const sectionLinks = Array.from(document.querySelectorAll('.social-section-nav a[href^="#"], .calendar-mini a[href^="#"]'));

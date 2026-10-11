@@ -12,7 +12,8 @@ const featureCaption = document.querySelector('#gallery-feature-caption');
 const photoCount = document.querySelector('#gallery-count');
 const carouselPrevious = document.querySelector('#gallery-previous');
 const carouselNext = document.querySelector('#gallery-next');
-const thumbnailButtons = [...document.querySelectorAll('.gallery-thumb')];
+const filmstrip = document.querySelector('.gallery-filmstrip');
+let thumbnailButtons = [...document.querySelectorAll('.gallery-thumb')];
 const reviewForm = document.querySelector('#review-form');
 const reviewStatus = document.querySelector('#review-status');
 const approvedNotes = document.querySelector('#approved-notes');
@@ -21,6 +22,8 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 let activePhoto = 0;
 let returnFocus;
 let touchStartX = 0;
+let approvedReviewCache = [];
+let backendNotes = [];
 
 function photoData(index) {
   const button = thumbnailButtons[index];
@@ -79,9 +82,13 @@ function closeViewer() {
   returnFocus?.focus();
 }
 
-thumbnailButtons.forEach((button, index) => {
-  button.addEventListener('click', () => setFeaturedPhoto(index));
-});
+function bindThumbnail(button) {
+  if (button.dataset.bound) return;
+  button.dataset.bound = 'true';
+  button.addEventListener('click', () => setFeaturedPhoto(thumbnailButtons.indexOf(button)));
+}
+
+thumbnailButtons.forEach(bindThumbnail);
 
 featureButton.addEventListener('click', openViewer);
 carouselPrevious.addEventListener('click', () => setFeaturedPhoto(activePhoto - 1));
@@ -165,16 +172,54 @@ function renderApprovedReviews(reviews) {
   `).join('');
 }
 
+function renderAllReviews() {
+  renderApprovedReviews([...backendNotes, ...approvedReviewCache]);
+}
+
 async function loadApprovedReviews() {
   if (!approvedNotes) return;
   try {
     const response = await fetch('/api/reviews', { headers: { Accept: 'application/json' } });
     if (!response.ok) return;
     const result = await response.json();
-    renderApprovedReviews(Array.isArray(result.reviews) ? result.reviews : []);
+    approvedReviewCache = Array.isArray(result.reviews) ? result.reviews : [];
+    renderAllReviews();
   } catch {
-    renderApprovedReviews([]);
+    approvedReviewCache = [];
+    renderAllReviews();
   }
+}
+
+function appendBackendPhotos(photos = []) {
+  if (!filmstrip || !Array.isArray(photos) || !photos.length) return;
+  const existingIds = new Set(thumbnailButtons.map((button) => button.dataset.backendId).filter(Boolean));
+  photos.forEach((photo) => {
+    if (!photo.image || !photo.title || existingIds.has(photo.id)) return;
+    const button = document.createElement('button');
+    button.className = 'gallery-thumb';
+    button.type = 'button';
+    button.dataset.backendId = photo.id;
+    button.dataset.viewSrc = photo.image;
+    button.dataset.viewTitle = photo.title;
+    button.dataset.viewCaption = photo.caption || 'A sweet Whiskers & Wags care moment.';
+    button.setAttribute('aria-label', `Show ${photo.title}`);
+    button.setAttribute('aria-pressed', 'false');
+    button.innerHTML = `<img src="${photo.image}" alt="" loading="lazy">`;
+    filmstrip.append(button);
+    bindThumbnail(button);
+  });
+  thumbnailButtons = [...document.querySelectorAll('.gallery-thumb')];
+  setFeaturedPhoto(activePhoto);
+}
+
+function applyBackendContent(content) {
+  appendBackendPhotos(content.gallery?.photos || []);
+  backendNotes = (content.gallery?.testimonials || []).map((note) => ({
+    rating: note.rating || 5,
+    review: note.review,
+    displayName: note.displayName,
+  })).filter((note) => note.review && note.displayName);
+  renderAllReviews();
 }
 
 reviewForm.addEventListener('submit', async (event) => {
@@ -219,3 +264,6 @@ reviewForm.addEventListener('submit', async (event) => {
 });
 
 loadApprovedReviews();
+
+window.addEventListener('whiskers:content', (event) => applyBackendContent(event.detail || {}));
+if (window.whiskersContent) applyBackendContent(window.whiskersContent);

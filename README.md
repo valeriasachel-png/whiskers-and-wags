@@ -7,6 +7,7 @@ A responsive multi-page website for a pet sitting and home sitting business. It 
 - Swipeable photo journal with all gallery photos and a client-notes area ready for approved quotes
 - Exact Amazon product recommendations with active Associates tracking disclosure
 - Server-side booking, private review delivery, and approval-based public reviews through Cloudflare Pages Functions, Cloudflare KV, and Resend
+- Private `/admin` dashboard for editing announcement copy, homepage copy, gallery photos, featured notes, pet-of-the-week content, and care tips
 - Basic bot-trap protection for request and review submissions
 
 ## Run Locally
@@ -40,6 +41,15 @@ EMAIL_FROM=Whiskers & Wags <bookings@whiskersandwagsms.com>
 PORT=4173
 ```
 
+Local admin testing:
+
+```dotenv
+ADMIN_PASSWORD=choose_a_private_password
+ADMIN_SESSION_SECRET=use_a_long_random_string
+```
+
+If `ADMIN_PASSWORD` is omitted locally, `server.mjs` accepts `admin` for convenience. Do not use that for production.
+
 For deployment, configure the same values in Cloudflare Pages. Save `RESEND_API_KEY` as an encrypted secret. Do not commit `.env` or expose `RESEND_API_KEY` in frontend files.
 
 Client-note approval also requires a Cloudflare KV namespace bound to the Pages project with this exact binding name:
@@ -49,6 +59,28 @@ REVIEWS_KV
 ```
 
 The approval email button uses `SITE_URL` when it is present. Set `SITE_URL=https://whiskersandwagsms.com` in Cloudflare Pages variables.
+
+## Admin Backend Setup
+
+The private dashboard lives at `/admin`. It lets you sign in and update helpful website content without editing code.
+
+For production, add these Cloudflare Pages variables and bindings:
+
+```text
+ADMIN_PASSWORD        Secret value. Use a strong password.
+ADMIN_SESSION_SECRET  Secret value. Use a long random string.
+SITE_CONTENT_KV       Cloudflare KV namespace binding for editable site content.
+```
+
+Recommended Cloudflare setup:
+
+1. Create a new KV namespace named something like `whiskers_site_content`.
+2. Bind it to the Pages project with the exact binding name `SITE_CONTENT_KV`.
+3. Add `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` as encrypted secrets.
+4. Redeploy.
+5. Open `/admin`, sign in, make a small announcement edit, save, and verify it appears publicly.
+
+Backend-uploaded photos are stored as image data in KV. Keep each image under about 2 MB. This is intended for convenient gallery updates; a larger media library should move to Cloudflare R2 later.
 
 ## Customize Content
 

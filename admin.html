@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Admin Dashboard | Whiskers &amp; Wags</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css?v=20261005-1">
+    <script src="/admin.js?v=20261005-1" defer></script>
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell">
+      <section class="admin-panel admin-login" id="login-panel">
+        <div class="eyebrow">Whiskers &amp; Wags Admin</div>
+        <h1>Sign in to edit the website.</h1>
+        <p>Use this private dashboard to update announcements, home copy, gallery photos, featured notes, and social page tips.</p>
+        <form id="login-form">
+          <label for="admin-password">Admin password</label>
+          <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+          <button class="button" type="submit">Sign In</button>
+          <p class="form-status" id="login-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="admin-dashboard" id="dashboard" hidden>
+        <header class="admin-dashboard-header">
+          <div>
+            <div class="eyebrow">Website Backend</div>
+            <h1>Update Whiskers &amp; Wags</h1>
+            <p>Changes save to Cloudflare KV and appear on the public website automatically.</p>
+          </div>
+          <div class="admin-actions">
+            <a class="button button-secondary" href="/" target="_blank" rel="noopener">View Site</a>
+            <button class="button button-secondary" id="logout-button" type="button">Log Out</button>
+          </div>
+        </header>
+
+        <form class="admin-grid" id="content-form">
+          <section class="admin-panel">
+            <h2>Announcement Bar</h2>
+            <p>Show a short banner at the top of the site for holiday booking, urgent updates, or promos.</p>
+            <label class="checkbox-line" for="announcement-enabled">
+              <input id="announcement-enabled" name="announcementEnabled" type="checkbox">
+              Show announcement
+            </label>
+            <label for="announcement-text">Announcement text</label>
+            <input id="announcement-text" name="announcementText" type="text" maxlength="180" placeholder="Holiday dates are booking quickly.">
+            <div class="form-grid two">
+              <div>
+                <label for="announcement-link-text">Button text</label>
+                <input id="announcement-link-text" name="announcementLinkText" type="text" maxlength="60" placeholder="Request Care">
+              </div>
+              <div>
+                <label for="announcement-link-href">Button link</label>
+                <input id="announcement-link-href" name="announcementLinkHref" type="text" maxlength="300" placeholder="/request">
+              </div>
+            </div>
+          </section>
+
+          <section class="admin-panel">
+            <h2>Homepage Copy</h2>
+            <label for="home-tagline">Hero tagline override</label>
+            <input id="home-tagline" name="homeTagline" type="text" maxlength="90" placeholder="Love and care when you're not there!">
+            <label for="home-intro">Hero intro override</label>
+            <textarea id="home-intro" name="homeIntro" rows="4" maxlength="420" placeholder="Write a warmer homepage intro here. Leave blank to use the default."></textarea>
+          </section>
+
+          <section class="admin-panel admin-wide">
+            <div class="admin-section-heading">
+              <div>
+                <h2>Gallery Photos</h2>
+                <p>Add approved photos without touching code. Keep images under about 2 MB each.</p>
+              </div>
+              <button class="button button-secondary" id="add-photo-button" type="button">Add Photo</button>
+            </div>
+            <div class="admin-list" id="photo-list"></div>
+          </section>
+
+          <section class="admin-panel admin-wide">
+            <div class="admin-section-heading">
+              <div>
+                <h2>Featured Client Notes</h2>
+                <p>Use only notes you have permission to publish. These appear with approved reviews.</p>
+              </div>
+              <button class="button button-secondary" id="add-testimonial-button" type="button">Add Note</button>
+            </div>
+            <div class="admin-list" id="testimonial-list"></div>
+          </section>
+
+          <section class="admin-panel">
+            <h2>Social Page Spotlight</h2>
+            <label for="pet-week-title-input">Pet of the Week title</label>
+            <input id="pet-week-title-input" name="petWeekTitle" type="text" maxlength="90" placeholder="Meet Bella">
+            <label for="pet-week-description">Pet of the Week description</label>
+            <textarea id="pet-week-description" name="petWeekDescription" rows="4" maxlength="340" placeholder="Add a short, permission-approved feature note."></textarea>
+            <label for="pet-week-image">Pet of the Week image</label>
+            <input id="pet-week-image" name="petWeekImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+            <img class="admin-image-preview" id="pet-week-preview" alt="" hidden>
+          </section>
+
+          <section class="admin-panel">
+            <div class="admin-section-heading">
+              <div>
+                <h2>Extra Pet Tips</h2>
+                <p>Add tips to the Social &amp; Events care notes section.</p>
+              </div>
+              <button class="button button-secondary" id="add-tip-button" type="button">Add Tip</button>
+            </div>
+            <div class="admin-list" id="tip-list"></div>
+          </section>
+
+          <section class="admin-panel admin-save-panel">
+            <button class="button" type="submit">Save Website Changes</button>
+            <p class="form-status" id="save-status" role="status" aria-live="polite"></p>
+            <p class="muted">Tip: after saving, open the live page and hard refresh if your browser is holding an older version.</p>
+          </section>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

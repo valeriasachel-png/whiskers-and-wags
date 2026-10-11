@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { randomBytes } from 'node:crypto';
+import { createHmac, randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,6 +31,7 @@ const requestWindows = new Map();
 const localPendingReviews = new Map();
 let localApprovedReviews = [];
 let localSocialFeedCache = null;
+let localSiteContent = defaultSiteContent();
 const REQUEST_LIMIT = 5;
 const REQUEST_WINDOW_MS = 15 * 60 * 1000;
 const contentTypes = {
@@ -54,11 +55,11 @@ function json(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
-async function readJson(request) {
+async function readJson(request, maxLength = 100_000) {
   let data = '';
   for await (const chunk of request) {
     data += chunk;
-    if (data.length > 100_000) throw new Error('Request is too large.');
+    if (data.length > maxLength) throw new Error('Request is too large.');
   }
   return JSON.parse(data || '{}');
 }
@@ -170,6 +171,135 @@ function publicReview(record) {
     displayName: record.displayName,
     approvedAt: record.approvedAt,
   };
+}
+
+function defaultSiteContent() {
+  return {
+    announcement: {
+      enabled: false,
+      text: '',
+      linkText: 'Request Care',
+      linkHref: '/request',
+    },
+    home: {
+      tagline: '',
+      intro: '',
+    },
+    gallery: {
+      photos: [],
+      testimonials: [],
+    },
+    social: {
+      petOfWeekTitle: '',
+      petOfWeekDescription: '',
+      petOfWeekImage: '',
+      tips: [],
+    },
+    updatedAt: null,
+  };
+}
+
+function safeHref(value) {
+  const href = cleanText(value, 300);
+  if (!href) return '';
+  if (href.startsWith('/')) return href;
+  try {
+    const url = new URL(href);
+    return ['http:', 'https:', 'mailto:', 'tel:'].includes(url.protocol) ? href : '';
+  } catch {
+    return '';
+  }
+}
+
+function cleanImage(value) {
+  const image = String(value ?? '').trim();
+  if (!image) return '';
+  if (image.startsWith('/assets/')) return image.slice(0, 240);
+  if (/^data:image\/(png|jpe?g|webp|gif);base64,[a-z0-9+/=]+$/i.test(image) && image.length <= 2_500_000) return image;
+  return '';
+}
+
+function sanitizeSiteContent(input = {}) {
+  const photos = Array.isArray(input.gallery?.photos)
+    ? input.gallery.photos.slice(0, 18).map((photo) => ({
+        id: cleanText(photo.id, 80) || makeId(),
+        title: cleanText(photo.title, 90),
+        caption: cleanText(photo.caption, 240),
+        image: cleanImage(photo.image),
+      })).filter((photo) => photo.title && photo.image)
+    : [];
+  const testimonials = Array.isArray(input.gallery?.testimonials)
+    ? input.gallery.testimonials.slice(0, 12).map((testimonial) => {
+        const rating = Number(testimonial.rating);
+        return {
+          id: cleanText(testimonial.id, 80) || makeId(),
+          rating: Number.isInteger(rating) && rating >= 1 && rating <= 5 ? rating : 5,
+          displayName: cleanText(testimonial.displayName, 80),
+          review: cleanText(testimonial.review, 1000),
+        };
+      }).filter((testimonial) => testimonial.displayName && testimonial.review)
+    : [];
+  const tips = Array.isArray(input.social?.tips)
+    ? input.social.tips.slice(0, 12).map((tip) => ({
+        petType: cleanText(tip.petType, 60),
+        tip: cleanText(tip.tip, 260),
+      })).filter((tip) => tip.petType && tip.tip)
+    : [];
+  return {
+    announcement: {
+      enabled: Boolean(input.announcement?.enabled),
+      text: cleanText(input.announcement?.text, 180),
+      linkText: cleanText(input.announcement?.linkText, 60) || 'Request Care',
+      linkHref: safeHref(input.announcement?.linkHref) || '/request',
+    },
+    home: {
+      tagline: cleanText(input.home?.tagline, 90),
+      intro: cleanText(input.home?.intro, 420),
+    },
+    gallery: { photos, testimonials },
+    social: {
+      petOfWeekTitle: cleanText(input.social?.petOfWeekTitle, 90),
+      petOfWeekDescription: cleanText(input.social?.petOfWeekDescription, 340),
+      petOfWeekImage: cleanImage(input.social?.petOfWeekImage),
+      tips,
+    },
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function cookieValue(request, name) {
+  const cookie = request.headers.cookie || '';
+  return cookie
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`))
+    ?.slice(name.length + 1) || '';
+}
+
+function localAdminSecret() {
+  return process.env.ADMIN_SESSION_SECRET || 'local-admin-session-secret';
+}
+
+function localAdminPassword() {
+  return process.env.ADMIN_PASSWORD || 'admin';
+}
+
+function signLocalSession(value) {
+  return createHmac('sha256', localAdminSecret()).update(value).digest('base64url');
+}
+
+function makeLocalSession() {
+  const expires = Math.floor(Date.now() / 1000) + 60 * 60 * 8;
+  const payload = `admin.${expires}`;
+  return `${payload}.${signLocalSession(payload)}`;
+}
+
+function localSessionValid(request) {
+  const parts = cookieValue(request, 'ww_admin').split('.');
+  if (parts.length !== 3 || parts[0] !== 'admin') return false;
+  const expires = Number(parts[1]);
+  if (!Number.isFinite(expires) || expires < Math.floor(Date.now() / 1000)) return false;
+  return signLocalSession(`${parts[0]}.${parts[1]}`) === parts[2];
 }
 
 function socialFallbackFeed() {
@@ -1133,6 +1263,68 @@ async function submitEvent(request, response) {
   return response.end();
 }
 
+function getPublicContent(response) {
+  return json(response, 200, { content: localSiteContent });
+}
+
+async function handleAdmin(request, response, url) {
+  const action = url.searchParams.get('action') || '';
+
+  if (request.method === 'GET' && action === 'session') {
+    return json(response, 200, { authenticated: localSessionValid(request) });
+  }
+
+  if (request.method === 'POST' && action === 'login') {
+    let input;
+    try {
+      input = await readJson(request);
+    } catch {
+      return json(response, 400, { message: 'Please submit valid login details.' });
+    }
+    if (String(input.password || '') !== localAdminPassword()) {
+      return json(response, 401, { message: 'That password is not correct.' });
+    }
+    response.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+      'Set-Cookie': `ww_admin=${makeLocalSession()}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 8}`,
+    });
+    return response.end(JSON.stringify({ authenticated: true }));
+  }
+
+  if (request.method === 'POST' && action === 'logout') {
+    response.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+      'Set-Cookie': 'ww_admin=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0',
+    });
+    return response.end(JSON.stringify({ authenticated: false }));
+  }
+
+  if (!localSessionValid(request)) {
+    return json(response, 401, { message: 'Please sign in again.' });
+  }
+
+  if (request.method === 'GET' && action === 'content') {
+    return json(response, 200, { content: localSiteContent });
+  }
+
+  if (request.method === 'PUT' && action === 'content') {
+    let input;
+    try {
+      input = await readJson(request, 8_000_000);
+    } catch {
+      return json(response, 400, { message: 'Please submit valid content.' });
+    }
+    localSiteContent = sanitizeSiteContent(input.content || {});
+    return json(response, 200, { content: localSiteContent });
+  }
+
+  return json(response, 405, { message: 'Unsupported admin request.' });
+}
+
 async function serveStatic(request, response, url) {
   const cleanRouteFiles = {
     '/request': '/request.html',
@@ -1142,6 +1334,7 @@ async function serveStatic(request, response, url) {
     '/client-intake': '/client-intake.html',
     '/social-events': '/social-events.html',
     '/about': '/about.html',
+    '/admin': '/admin.html',
   };
   const requested =
     url.pathname === '/' ? '/index.html' : cleanRouteFiles[url.pathname] || decodeURIComponent(url.pathname);
@@ -1157,7 +1350,7 @@ async function serveStatic(request, response, url) {
     const content = await readFile(filename);
     response.writeHead(200, {
       'Content-Type': contentTypes[extension],
-      'Content-Security-Policy': "default-src 'self'; img-src 'self' https://m.media-amazon.com; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+      'Content-Security-Policy': "default-src 'self'; img-src 'self' data: https://m.media-amazon.com; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
@@ -1198,6 +1391,12 @@ const server = createServer(async (request, response) => {
   }
   if (request.method === 'POST' && url.pathname === '/api/events') {
     return submitEvent(request, response);
+  }
+  if (request.method === 'GET' && url.pathname === '/api/content') {
+    return getPublicContent(response);
+  }
+  if (url.pathname === '/api/admin') {
+    return handleAdmin(request, response, url);
   }
   if (request.method === 'GET' && url.pathname === '/api/social-feed') {
     return getSocialFeed(response);
