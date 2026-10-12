@@ -8,6 +8,29 @@ const photoList = document.querySelector('#photo-list');
 const testimonialList = document.querySelector('#testimonial-list');
 const tipList = document.querySelector('#tip-list');
 const petWeekPreview = document.querySelector('#pet-week-preview');
+const editorFields = document.querySelector('#editor-fields');
+const editorStatus = document.querySelector('#editor-status');
+const publishDialog = document.querySelector('#publish-dialog');
+const reviewButton = document.querySelector('#review-changes');
+const discardButton = document.querySelector('#discard-changes');
+const destinations = {
+  '/request': 'Request Care', '/gallery': 'See Photos & Reviews',
+  '/picks': 'Browse Pet Care Picks', '/social-events': 'Explore Social & Events', '/about': 'About Us',
+};
+let savedState = null;
+let dirty = false;
+let uploading = 0;
+
+function updateDraft() {
+  if (!savedState) return;
+  collectState();
+  dirty = JSON.stringify(state) !== JSON.stringify(savedState);
+  reviewButton.disabled = !dirty || uploading > 0;
+  discardButton.disabled = !dirty || uploading > 0;
+  setStatus(editorStatus, uploading ? 'Reading your photo. Please wait...' : dirty
+    ? 'You have unsaved changes. They are not on the website yet.'
+    : 'Your saved content is ready. Choose a section to make an update.');
+}
 
 let state = {
   announcement: { enabled: false, text: '', linkText: 'Request Care', linkHref: '/request' },
@@ -28,8 +51,9 @@ function uid(prefix) {
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     if (!file) return resolve('');
-    if (!file.type.startsWith('image/')) return reject(new Error('Please choose an image file.'));
-    if (file.size > 2_500_000) return reject(new Error('Please choose an image under 2.5 MB.'));
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) return reject(new Error('Choose a JPG, PNG, WebP, or GIF photo. For an iPhone HEIC photo, export it as a JPEG first.'));
+    // Base64 adds about one third to the size; keep below the server's encoded-image limit.
+    if (file.size > 1_800_000) return reject(new Error('That photo is too large. Choose a smaller copy under 1.8 MB. Your other changes are still here.'));
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result || ''));
     reader.onerror = () => reject(new Error('Could not read that image.'));
@@ -43,72 +67,73 @@ function textValue(selector) {
 
 function renderPhotos() {
   if (!state.gallery.photos.length) {
-    photoList.innerHTML = '<p class="admin-empty">No backend photos yet. Add one approved pet photo to feature it in the gallery.</p>';
+    photoList.innerHTML = '<p class="admin-empty">Your original gallery photos are still on the website. Click Add a Photo above to add another.</p>';
     return;
   }
 
   photoList.innerHTML = state.gallery.photos.map((photo, index) => `
     <article class="admin-item" data-index="${index}">
-      ${photo.image ? `<img src="${photo.image}" alt="">` : '<div class="admin-image-placeholder">Photo</div>'}
+      ${photo.image ? `<img src="${escapeHtml(photo.image)}" alt="Selected pet photo">` : '<div class="admin-image-placeholder">Choose a photo below</div>'}
       <div>
-        <label>Photo title
-          <input data-photo-field="title" value="${escapeHtml(photo.title)}" maxlength="90">
+        <label>Pet name or photo title (required)
+          <input data-photo-field="title" value="${escapeHtml(photo.title)}" maxlength="90" required placeholder="Example: Bella enjoying the sunshine" aria-describedby="photo-title-help-${index}">
         </label>
-        <label>Caption
-          <textarea data-photo-field="caption" rows="3" maxlength="240">${escapeHtml(photo.caption)}</textarea>
+        <p class="admin-help" id="photo-title-help-${index}">This name appears with the photo in your gallery.</p>
+        <label>A short description (optional)
+          <textarea data-photo-field="caption" rows="3" maxlength="240" placeholder="Example: A relaxing afternoon after our walk.">${escapeHtml(photo.caption)}</textarea>
         </label>
-        <label>Replace image
-          <input data-photo-field="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+        <label>${photo.image ? 'Choose a different photo' : 'Choose a photo (required)'}
+          <input data-photo-field="image" type="file" ${photo.image ? '' : 'required'} accept="image/png,image/jpeg,image/webp,image/gif">
         </label>
       </div>
-      <button class="button button-secondary" data-remove-photo type="button">Remove</button>
+      <button class="button button-secondary" data-remove-photo type="button">Remove This Photo</button>
     </article>
   `).join('');
 }
 
 function renderTestimonials() {
   if (!state.gallery.testimonials.length) {
-    testimonialList.innerHTML = '<p class="admin-empty">No featured notes yet. Approved email-click reviews will still appear automatically.</p>';
+    testimonialList.innerHTML = '<p class="admin-empty">No reviews have been added here yet. Reviews you already approved by email stay on the website.</p>';
     return;
   }
 
   testimonialList.innerHTML = state.gallery.testimonials.map((note, index) => `
     <article class="admin-item admin-item-compact" data-index="${index}">
       <div>
-        <label>Display name
-          <input data-testimonial-field="displayName" value="${escapeHtml(note.displayName)}" maxlength="80">
+        <label>Customer name shown to visitors (required)
+          <input data-testimonial-field="displayName" value="${escapeHtml(note.displayName)}" maxlength="80" required placeholder="Example: Sarah M.">
         </label>
-        <label>Rating
+        <label>How many stars did the customer give?
           <select data-testimonial-field="rating">
             ${[5, 4, 3, 2, 1].map((rating) => `<option value="${rating}" ${Number(note.rating) === rating ? 'selected' : ''}>${rating} stars</option>`).join('')}
           </select>
         </label>
-        <label>Review
-          <textarea data-testimonial-field="review" rows="4" maxlength="1000">${escapeHtml(note.review)}</textarea>
+        <label>The customer's review (required)
+          <textarea data-testimonial-field="review" rows="4" maxlength="1000" required placeholder="Paste the customer's own words here.">${escapeHtml(note.review)}</textarea>
         </label>
       </div>
-      <button class="button button-secondary" data-remove-testimonial type="button">Remove</button>
+      <button class="button button-secondary" data-remove-testimonial type="button">Remove This Review</button>
     </article>
   `).join('');
 }
 
 function renderTips() {
   if (!state.social.tips.length) {
-    tipList.innerHTML = '<p class="admin-empty">No extra tips yet.</p>';
+    tipList.innerHTML = '<p class="admin-empty">Click Add a Tip to share advice. The tips already on the website stay in place.</p>';
     return;
   }
 
   tipList.innerHTML = state.social.tips.map((tip, index) => `
     <article class="admin-item admin-item-compact" data-index="${index}">
       <div>
-        <label>Pet type
-          <input data-tip-field="petType" value="${escapeHtml(tip.petType)}" maxlength="60">
+        <label>What kind of pet is this for? (required)
+          <input data-tip-field="petType" value="${escapeHtml(tip.petType)}" maxlength="60" required placeholder="Example: Cats">
         </label>
-        <label>Tip
-          <textarea data-tip-field="tip" rows="3" maxlength="260">${escapeHtml(tip.tip)}</textarea>
+        <label>Your care tip (required)
+          <textarea data-tip-field="tip" rows="3" maxlength="260" required placeholder="Example: Give your cat a quiet place to rest away from busy rooms.">${escapeHtml(tip.tip)}</textarea>
         </label>
       </div>
-      <button class="button button-secondary" data-remove-tip type="button">Remove</button>
+      <button class="button button-secondary" data-remove-tip type="button">Remove This Tip</button>
     </article>
   `).join('');
 }
@@ -126,8 +151,15 @@ function escapeHtml(value) {
 function renderState() {
   document.querySelector('#announcement-enabled').checked = Boolean(state.announcement.enabled);
   document.querySelector('#announcement-text').value = state.announcement.text || '';
-  document.querySelector('#announcement-link-text').value = state.announcement.linkText || 'Request Care';
-  document.querySelector('#announcement-link-href').value = state.announcement.linkHref || '/request';
+  const destination = document.querySelector('#announcement-destination');
+  destination.querySelector('[data-existing]')?.remove();
+  const currentHref = state.announcement.linkHref || '/request';
+  if (!destinations[currentHref]) {
+    const existing = new Option('Keep the current destination', currentHref);
+    existing.dataset.existing = 'true';
+    destination.add(existing);
+  }
+  destination.value = currentHref;
   document.querySelector('#home-tagline').value = state.home.tagline || '';
   document.querySelector('#home-intro').value = state.home.intro || '';
   document.querySelector('#pet-week-title-input').value = state.social.petOfWeekTitle || '';
@@ -144,11 +176,13 @@ function renderState() {
 }
 
 function collectState() {
+  const href = textValue('#announcement-destination');
+  const linkText = href === state.announcement.linkHref ? state.announcement.linkText : destinations[href];
   state.announcement = {
     enabled: document.querySelector('#announcement-enabled').checked,
     text: textValue('#announcement-text'),
-    linkText: textValue('#announcement-link-text') || 'Request Care',
-    linkHref: textValue('#announcement-link-href') || '/request',
+    linkText: linkText || 'Request Care',
+    linkHref: href || '/request',
   };
   state.home = {
     tagline: textValue('#home-tagline'),
@@ -163,7 +197,10 @@ async function loadContent() {
   const result = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(result.message || 'Could not load admin content.');
   state = result.content;
+  savedState = structuredClone(state);
   renderState();
+  editorFields.disabled = false;
+  updateDraft();
 }
 
 async function checkSession() {
@@ -195,27 +232,42 @@ loginForm.addEventListener('submit', async (event) => {
     await loadContent();
   } catch (error) {
     setStatus(loginStatus, error.message, 'error');
+    if (!dashboard.hidden) setStatus(editorStatus, 'Could not load your saved content. Refresh this page to try again. Editing is paused to protect it.', 'error');
   }
 });
 
 document.querySelector('#logout-button').addEventListener('click', async () => {
-  await fetch('/api/admin?action=logout', { method: 'POST' }).catch(() => {});
-  location.reload();
+  if (dirty && !window.confirm('You have unpublished changes. Log out without saving them?')) return;
+  try {
+    const response = await fetch('/api/admin?action=logout', { method: 'POST' });
+    if (!response.ok) throw new Error('Could not log out. Please try again.');
+    dirty = false;
+    location.reload();
+  } catch (error) { setStatus(editorStatus, error.message, 'error'); }
 });
 
 document.querySelector('#add-photo-button').addEventListener('click', () => {
+  if (state.gallery.photos.length >= 18) return setStatus(editorStatus, 'You can add up to 18 photos here. Remove one before adding another.', 'error');
   state.gallery.photos.push({ id: uid('photo'), title: '', caption: '', image: '' });
   renderPhotos();
+  updateDraft();
+  photoList.lastElementChild.querySelector('input').focus();
 });
 
 document.querySelector('#add-testimonial-button').addEventListener('click', () => {
+  if (state.gallery.testimonials.length >= 12) return setStatus(editorStatus, 'You can add up to 12 reviews here. Remove one before adding another.', 'error');
   state.gallery.testimonials.push({ id: uid('note'), rating: 5, displayName: '', review: '' });
   renderTestimonials();
+  updateDraft();
+  testimonialList.lastElementChild.querySelector('input').focus();
 });
 
 document.querySelector('#add-tip-button').addEventListener('click', () => {
+  if (state.social.tips.length >= 12) return setStatus(editorStatus, 'You can add up to 12 tips here. Remove one before adding another.', 'error');
   state.social.tips.push({ petType: '', tip: '' });
   renderTips();
+  updateDraft();
+  tipList.lastElementChild.querySelector('input').focus();
 });
 
 photoList.addEventListener('input', (event) => {
@@ -231,11 +283,19 @@ photoList.addEventListener('change', async (event) => {
   const item = event.target.closest('.admin-item');
   const index = Number(item?.dataset.index);
   if (!Number.isInteger(index)) return;
+  if (!event.target.files[0]) return;
+  const photo = state.gallery.photos[index];
+  uploading += 1;
+  updateDraft();
   try {
-    state.gallery.photos[index].image = await readFileAsDataUrl(event.target.files[0]);
+    photo.image = await readFileAsDataUrl(event.target.files[0]);
     renderPhotos();
   } catch (error) {
+    event.target.value = '';
     setStatus(saveStatus, error.message, 'error');
+  } finally {
+    uploading -= 1;
+    updateDraft();
   }
 });
 
@@ -244,6 +304,7 @@ photoList.addEventListener('click', (event) => {
   const index = Number(event.target.closest('.admin-item')?.dataset.index);
   state.gallery.photos.splice(index, 1);
   renderPhotos();
+  updateDraft();
 });
 
 testimonialList.addEventListener('input', (event) => {
@@ -259,6 +320,7 @@ testimonialList.addEventListener('click', (event) => {
   const index = Number(event.target.closest('.admin-item')?.dataset.index);
   state.gallery.testimonials.splice(index, 1);
   renderTestimonials();
+  updateDraft();
 });
 
 tipList.addEventListener('input', (event) => {
@@ -274,39 +336,135 @@ tipList.addEventListener('click', (event) => {
   const index = Number(event.target.closest('.admin-item')?.dataset.index);
   state.social.tips.splice(index, 1);
   renderTips();
+  updateDraft();
 });
 
 document.querySelector('#pet-week-image').addEventListener('change', async (event) => {
+  if (!event.target.files[0]) return;
+  uploading += 1;
+  updateDraft();
   try {
     state.social.petOfWeekImage = await readFileAsDataUrl(event.target.files[0]);
+    collectState();
     renderState();
   } catch (error) {
+    event.target.value = '';
     setStatus(saveStatus, error.message, 'error');
+  } finally {
+    uploading -= 1;
+    updateDraft();
   }
 });
 
 contentForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   collectState();
+  if (!dirty || uploading) return;
+  for (const field of contentForm.querySelectorAll('input[required]:not([type="file"]), textarea[required]')) {
+    field.setCustomValidity(field.value.trim() ? '' : 'Please fill in this field.');
+    if (!field.reportValidity()) return;
+  }
+  if (state.announcement.enabled && !state.announcement.text) {
+    document.querySelector('#announcement-text').setCustomValidity('Write a message or turn off Show this message.');
+    document.querySelector('#announcement-text').reportValidity();
+    return;
+  }
+  const groups = [
+    ['announcement', 'Top message', state.announcement.enabled ? state.announcement.text : 'Message will be hidden.'],
+    ['home', 'Home page words', `${state.home.tagline || 'Original welcome sentence'}; ${state.home.intro || 'Original introduction'}`],
+    ['gallery', 'Gallery additions', `${state.gallery.photos.length} photos and ${state.gallery.testimonials.length} reviews will be kept in this editor. Original gallery photos and email-approved reviews stay in place.`],
+    ['social', 'Pet of the Week and tips', `${state.social.petOfWeekTitle || 'Original pet title'}; ${state.social.tips.length} added tips.`],
+  ];
+  const summary = document.querySelector('#publish-summary');
+  summary.replaceChildren();
+  for (const [key, label, detail] of groups) {
+    if (JSON.stringify(state[key]) === JSON.stringify(savedState[key])) continue;
+    const item = document.createElement('li');
+    const title = document.createElement('strong');
+    title.textContent = label;
+    const description = document.createElement('p');
+    description.textContent = detail;
+    item.append(title, description);
+    summary.append(item);
+  }
+  for (const [current, previous, label] of [
+    [state.gallery.photos, savedState.gallery.photos, 'photo'],
+    [state.gallery.testimonials, savedState.gallery.testimonials, 'review'],
+  ]) {
+    for (const entry of current.filter((item) => !previous.some((old) => JSON.stringify(old) === JSON.stringify(item)))) {
+      const detail = document.createElement('li');
+      detail.textContent = label === 'photo' ? `Photo: ${entry.title}. ${entry.caption || ''}` : `Review: ${entry.displayName}, ${entry.rating} stars. ${entry.review}`;
+      summary.append(detail);
+    }
+    for (const item of previous.filter((entry) => !current.some((entryNow) => entryNow.id === entry.id))) {
+      const removal = document.createElement('li');
+      removal.textContent = `Remove ${label}: ${item.title || item.displayName}`;
+      summary.append(removal);
+    }
+  }
+  if (JSON.stringify(state.social) !== JSON.stringify(savedState.social)) {
+    const detail = document.createElement('li');
+    detail.textContent = `Pet story: ${state.social.petOfWeekDescription || 'Keep original story.'}${state.social.petOfWeekImage !== savedState.social.petOfWeekImage ? ' Pet photo will be replaced.' : ''}`;
+    summary.append(detail);
+    for (const tip of state.social.tips) {
+      const item = document.createElement('li');
+      item.textContent = `${tip.petType}: ${tip.tip}`;
+      summary.append(item);
+    }
+  }
+  publishDialog.showModal();
+});
+
+document.querySelector('#keep-editing').addEventListener('click', () => publishDialog.close());
+document.querySelector('#publish-changes').addEventListener('click', async () => {
+  publishDialog.close();
   setStatus(saveStatus, 'Saving...');
-  const submitButton = contentForm.querySelector('button[type="submit"]');
-  submitButton.disabled = true;
+  editorFields.disabled = true;
   try {
+    const payload = JSON.stringify({ content: state });
+    if (new Blob([payload]).size > 7_500_000) throw new Error('These photos are too large together. Use smaller copies or remove a new photo before publishing. Your changes are still here.');
     const response = await fetch('/api/admin?action=content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: state }),
+      body: payload,
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.message || 'Could not save changes.');
     state = result.content;
+    savedState = structuredClone(state);
     renderState();
-    setStatus(saveStatus, 'Saved. Your website content is updated.', 'success');
+    setStatus(saveStatus, 'Published. Your changes are on the website. Click See Live Website to view them; allow a minute for photos and text to refresh.', 'success');
   } catch (error) {
     setStatus(saveStatus, error.message, 'error');
   } finally {
-    submitButton.disabled = false;
+    editorFields.disabled = false;
+    updateDraft();
   }
 });
 
-checkSession().catch((error) => setStatus(loginStatus, error.message, 'error'));
+contentForm.addEventListener('input', (event) => {
+  event.target.setCustomValidity?.('');
+  document.querySelector('#announcement-text').setCustomValidity('');
+  setStatus(saveStatus, '');
+  updateDraft();
+});
+contentForm.addEventListener('change', updateDraft);
+discardButton.addEventListener('click', () => {
+  if (!window.confirm('Discard all changes made since your last save? Your live website will stay as it is.')) return;
+  state = structuredClone(savedState);
+  renderState();
+  document.querySelector('#pet-week-image').value = '';
+  document.querySelector('#announcement-text').setCustomValidity('');
+  updateDraft();
+  setStatus(saveStatus, 'Unsaved changes discarded. Your live website has not changed.');
+});
+window.addEventListener('beforeunload', (event) => {
+  if (!dirty) return;
+  event.preventDefault();
+  event.returnValue = '';
+});
+
+checkSession().catch(() => {
+  setStatus(loginStatus, 'Could not load your saved content. Refresh this page to try again.', 'error');
+  setStatus(editorStatus, 'Could not load your saved content. Editing is paused to protect it. Refresh this page to try again.', 'error');
+});

@@ -6,15 +6,15 @@
     <meta name="robots" content="noindex,nofollow">
     <title>Admin Dashboard | Whiskers &amp; Wags</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/styles.css?v=20261005-1">
-    <script src="/admin.js?v=20261011-1" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20261011-2">
+    <script src="/admin.js?v=20261011-2" defer></script>
   </head>
   <body class="admin-page">
     <main class="admin-shell">
       <section class="admin-panel admin-login" id="login-panel">
         <div class="eyebrow">Whiskers &amp; Wags Admin</div>
         <h1>Sign in to edit the website.</h1>
-        <p>Use this private dashboard to update announcements, home copy, gallery photos, featured notes, and social page tips.</p>
+        <p>Sign in with your website username and password to add photos and edit the words visitors see.</p>
         <form id="login-form">
           <label for="admin-username">Username</label>
           <input id="admin-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
@@ -28,96 +28,122 @@
       <section class="admin-dashboard" id="dashboard" hidden>
         <header class="admin-dashboard-header">
           <div>
-            <div class="eyebrow">Website Backend</div>
-            <h1>Update Whiskers &amp; Wags</h1>
-            <p>Changes save to Cloudflare KV and appear on the public website automatically.</p>
+            <div class="eyebrow">Your website editor</div>
+            <h1>A little update, made easy.</h1>
+            <p>Choose a section below. Your changes stay here until you review and publish them.</p>
           </div>
           <div class="admin-actions">
-            <a class="button button-secondary" href="/" target="_blank" rel="noopener">View Site</a>
+            <a class="button button-secondary" href="/" target="_blank" rel="noopener">See Live Website</a>
             <button class="button button-secondary" id="logout-button" type="button">Log Out</button>
           </div>
         </header>
 
-        <form class="admin-grid" id="content-form">
-          <section class="admin-panel">
-            <h2>Announcement Bar</h2>
-            <p>Show a short banner at the top of the site for holiday booking, urgent updates, or promos.</p>
+        <aside class="admin-guide" aria-label="How to use your website editor">
+          <ol><li><strong>Choose what to update</strong><span>Edit a message, add a photo, or share a pet tip below.</span></li><li><strong>Review your changes</strong><span>Check the list before anything goes onto the website.</span></li><li><strong>Publish when ready</strong><span>Then open the live website to see your update.</span></li></ol>
+          <p>You can leave sections alone. Existing photos and reviews stay on the website.</p>
+        </aside>
+        <nav class="admin-shortcuts" aria-label="Choose what to edit">
+          <a href="#edit-message">Top message</a><a href="#edit-home">Home page words</a><a href="#edit-photos">Photos</a><a href="#edit-reviews">Customer reviews</a><a href="#edit-spotlight">Pet of the Week</a><a href="#edit-tips">Pet tips</a>
+        </nav>
+        <p class="form-status" id="editor-status" role="status">Loading your saved website content...</p>
+        <form id="content-form">
+        <fieldset id="editor-fields" class="admin-grid" disabled>
+          <legend class="sr-only">Website content</legend>
+          <section class="admin-panel" id="edit-message">
+            <div class="eyebrow">Appears at the top of every page</div>
+            <h2>A message for visitors</h2>
+            <p>Use this for a short update, such as holiday bookings. Turn it off when you no longer need it.</p>
             <label class="checkbox-line" for="announcement-enabled">
               <input id="announcement-enabled" name="announcementEnabled" type="checkbox">
-              Show announcement
+              Show this message on the website
             </label>
-            <label for="announcement-text">Announcement text</label>
-            <input id="announcement-text" name="announcementText" type="text" maxlength="180" placeholder="Holiday dates are booking quickly.">
-            <div class="form-grid two">
-              <div>
-                <label for="announcement-link-text">Button text</label>
-                <input id="announcement-link-text" name="announcementLinkText" type="text" maxlength="60" placeholder="Request Care">
-              </div>
-              <div>
-                <label for="announcement-link-href">Button link</label>
-                <input id="announcement-link-href" name="announcementLinkHref" type="text" maxlength="300" placeholder="/request">
-              </div>
-            </div>
+            <label for="announcement-text">What would you like visitors to know?</label>
+            <input id="announcement-text" name="announcementText" type="text" maxlength="180" aria-describedby="message-help" placeholder="Holiday dates are booking quickly.">
+            <p class="admin-help" id="message-help">Example: Now accepting Thanksgiving sitting requests. Keep it to one short sentence.</p>
+            <label for="announcement-destination">Where should the message's button take visitors?</label>
+            <select id="announcement-destination" aria-describedby="destination-help">
+              <option value="/request">Request pet or home sitting</option><option value="/gallery">See our pet photos and reviews</option><option value="/picks">Browse Pet Care Picks</option><option value="/social-events">Explore Social &amp; Events</option><option value="/about">Read About Us</option>
+            </select>
+            <p class="admin-help" id="destination-help">We set the button wording and web address for you. Leave the first choice selected to send visitors to the booking request form.</p>
           </section>
 
-          <section class="admin-panel">
-            <h2>Homepage Copy</h2>
-            <label for="home-tagline">Hero tagline override</label>
-            <input id="home-tagline" name="homeTagline" type="text" maxlength="90" placeholder="Love and care when you're not there!">
-            <label for="home-intro">Hero intro override</label>
-            <textarea id="home-intro" name="homeIntro" rows="4" maxlength="420" placeholder="Write a warmer homepage intro here. Leave blank to use the default."></textarea>
+          <section class="admin-panel" id="edit-home">
+            <div class="eyebrow">Appears on the home page</div>
+            <h2>Your welcome message</h2>
+            <label for="home-tagline">Main welcome sentence</label>
+            <input id="home-tagline" name="homeTagline" type="text" maxlength="90" aria-describedby="tagline-help" placeholder="Love and care when you're not there!">
+            <p class="admin-help" id="tagline-help">This is the large sentence at the top of the home page. Leave this empty to use: Love and care when you're not there!</p>
+            <label for="home-intro">Short introduction to your business</label>
+            <textarea id="home-intro" name="homeIntro" rows="4" maxlength="420" aria-describedby="intro-help" placeholder="Example: We help your pets feel at home while you're away."></textarea>
+            <p class="admin-help" id="intro-help">Write two or three welcoming sentences. Leave this empty to keep the website's original introduction.</p>
           </section>
 
-          <section class="admin-panel admin-wide">
+          <section class="admin-panel admin-wide" id="edit-photos">
             <div class="admin-section-heading">
               <div>
-                <h2>Gallery Photos</h2>
-                <p>Add approved photos without touching code. Keep images under about 2 MB each.</p>
+                <div class="eyebrow">Appears in Gallery &amp; Client Notes</div>
+                <h2>Add pet photos</h2>
+                <p>Click Add a Photo, choose a picture from your phone or computer, then give it a name. A short description is optional. Only use photos you have permission to share.</p>
+                <p class="admin-help">Use a JPG, PNG, WebP, or GIF smaller than 1.8 MB. If an iPhone photo ends in HEIC, export it as a JPEG first. The original gallery photos stay in place; this section manages photos added here.</p>
               </div>
-              <button class="button button-secondary" id="add-photo-button" type="button">Add Photo</button>
+              <button class="button button-secondary" id="add-photo-button" type="button">Add a Photo</button>
             </div>
             <div class="admin-list" id="photo-list"></div>
           </section>
 
-          <section class="admin-panel admin-wide">
+          <section class="admin-panel admin-wide" id="edit-reviews">
             <div class="admin-section-heading">
               <div>
-                <h2>Featured Client Notes</h2>
-                <p>Use only notes you have permission to publish. These appear with approved reviews.</p>
+                <div class="eyebrow">Appears beside customer reviews in the gallery</div>
+                <h2>Share a customer review</h2>
+                <p>Add a review a customer has given you permission to share. Enter their public name, their rating, and their own words. Reviews approved through your emails are managed separately.</p>
               </div>
-              <button class="button button-secondary" id="add-testimonial-button" type="button">Add Note</button>
+              <button class="button button-secondary" id="add-testimonial-button" type="button">Add a Review</button>
             </div>
             <div class="admin-list" id="testimonial-list"></div>
           </section>
 
-          <section class="admin-panel">
-            <h2>Social Page Spotlight</h2>
-            <label for="pet-week-title-input">Pet of the Week title</label>
-            <input id="pet-week-title-input" name="petWeekTitle" type="text" maxlength="90" placeholder="Meet Bella">
-            <label for="pet-week-description">Pet of the Week description</label>
-            <textarea id="pet-week-description" name="petWeekDescription" rows="4" maxlength="340" placeholder="Add a short, permission-approved feature note."></textarea>
-            <label for="pet-week-image">Pet of the Week image</label>
-            <input id="pet-week-image" name="petWeekImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+          <section class="admin-panel" id="edit-spotlight">
+            <div class="eyebrow">Appears on Social &amp; Events</div>
+            <h2>Pet of the Week</h2>
+            <p>Introduce a pet with their owner's permission. Leave a text box empty to keep the original wording. The saved photo stays unless you choose a replacement.</p>
+            <label for="pet-week-title-input">Introduce this pet</label>
+            <input id="pet-week-title-input" name="petWeekTitle" type="text" maxlength="90" placeholder="Meet Bella" aria-describedby="spotlight-title-help">
+            <p class="admin-help" id="spotlight-title-help">Example: Meet Bella, our Pet of the Week.</p>
+            <label for="pet-week-description">Tell visitors a little about them</label>
+            <textarea id="pet-week-description" name="petWeekDescription" rows="4" maxlength="340" placeholder="Bella loves sunny naps and her favorite squeaky toy." aria-describedby="spotlight-story-help"></textarea>
+            <p class="admin-help" id="spotlight-story-help">One or two sentences about their personality or favorite activity.</p>
+            <label for="pet-week-image">Choose this pet's photo</label>
+            <input id="pet-week-image" name="petWeekImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-describedby="spotlight-photo-help">
+            <p class="admin-help" id="spotlight-photo-help">Choose a JPG, PNG, WebP, or GIF under 1.8 MB. A preview will appear below.</p>
             <img class="admin-image-preview" id="pet-week-preview" alt="" hidden>
           </section>
 
-          <section class="admin-panel">
+          <section class="admin-panel" id="edit-tips">
             <div class="admin-section-heading">
               <div>
-                <h2>Extra Pet Tips</h2>
-                <p>Add tips to the Social &amp; Events care notes section.</p>
+                <div class="eyebrow">Appears on Social &amp; Events</div>
+                <h2>Share a pet care tip</h2>
+                <p>Choose a kind of pet and add one short, useful tip. Your new tips appear alongside the existing ones.</p>
               </div>
-              <button class="button button-secondary" id="add-tip-button" type="button">Add Tip</button>
+              <button class="button button-secondary" id="add-tip-button" type="button">Add a Tip</button>
             </div>
             <div class="admin-list" id="tip-list"></div>
           </section>
 
           <section class="admin-panel admin-save-panel">
-            <button class="button" type="submit">Save Website Changes</button>
+            <div><strong>Ready to update the website?</strong><p class="muted">Review first. Nothing goes live until you click Publish Changes.</p></div>
+            <div class="admin-actions"><button class="button button-secondary" id="discard-changes" type="button" disabled>Discard Unsaved Changes</button><button class="button" id="review-changes" type="submit" disabled>Review Changes</button></div>
             <p class="form-status" id="save-status" role="status" aria-live="polite"></p>
-            <p class="muted">Tip: after saving, open the live page and hard refresh if your browser is holding an older version.</p>
           </section>
+        </fieldset>
         </form>
+        <dialog class="admin-review" id="publish-dialog" aria-labelledby="publish-title" aria-describedby="publish-help">
+          <h2 id="publish-title">Check your changes</h2>
+          <p id="publish-help">These updates will be visible to everyone who visits your website. Sections not listed here will stay as they are.</p>
+          <ul id="publish-summary"></ul>
+          <div class="admin-actions"><button class="button button-secondary" id="keep-editing" type="button">Keep Editing</button><button class="button" id="publish-changes" type="button">Publish Changes</button></div>
+        </dialog>
       </section>
     </main>
   </body>
