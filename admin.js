@@ -66,14 +66,16 @@ function textValue(selector) {
 }
 
 function renderPhotos() {
+  const expanded = new Set([...photoList.querySelectorAll('details[open]')].map((item) => item.closest('.admin-item').dataset.photoId));
   if (!state.gallery.photos.length) {
-    photoList.innerHTML = '<p class="admin-empty">Your original gallery photos are still on the website. Click Add a Photo above to add another.</p>';
+    photoList.innerHTML = '<p class="admin-empty">There are no gallery photos in this list. Click Add a Photo to add one. Publishing an empty list hides the gallery.</p>';
     return;
   }
 
   photoList.innerHTML = state.gallery.photos.map((photo, index) => `
-    <article class="admin-item" data-index="${index}">
-      ${photo.image ? `<img src="${escapeHtml(photo.image)}" alt="Selected pet photo">` : '<div class="admin-image-placeholder">Choose a photo below</div>'}
+    <article class="admin-item admin-library-item" data-index="${index}" data-photo-id="${escapeHtml(photo.id)}">
+      <details ${!photo.title || expanded.has(photo.id) ? 'open' : ''}>
+      <summary>${photo.image ? `<img src="${escapeHtml(photo.image)}" alt="" loading="lazy">` : '<div class="admin-image-placeholder">New photo</div>'}<strong>${escapeHtml(photo.title || 'Your new photo')}</strong><span>Edit photo and words</span></summary>
       <div>
         <label>Pet name or photo title (required)
           <input data-photo-field="title" value="${escapeHtml(photo.title)}" maxlength="90" required placeholder="Example: Bella enjoying the sunshine" aria-describedby="photo-title-help-${index}">
@@ -87,18 +89,20 @@ function renderPhotos() {
         </label>
       </div>
       <button class="button button-secondary" data-remove-photo type="button">Remove This Photo</button>
+      </details>
     </article>
   `).join('');
 }
 
 function renderTestimonials() {
   if (!state.gallery.testimonials.length) {
-    testimonialList.innerHTML = '<p class="admin-empty">No reviews have been added here yet. Reviews you already approved by email stay on the website.</p>';
+    testimonialList.innerHTML = '<p class="admin-empty">No featured reviews in this list. New customer submissions still need your email approval before appearing here.</p>';
     return;
   }
 
   testimonialList.innerHTML = state.gallery.testimonials.map((note, index) => `
-    <article class="admin-item admin-item-compact" data-index="${index}">
+    <article class="admin-item admin-item-compact admin-library-item" data-index="${index}">
+      <details ${!note.displayName ? 'open' : ''}><summary><strong>${escapeHtml(note.displayName || 'New customer review')}</strong><span>${Number(note.rating)} stars &middot; Edit review</span></summary>
       <div>
         <label>Customer name shown to visitors (required)
           <input data-testimonial-field="displayName" value="${escapeHtml(note.displayName)}" maxlength="80" required placeholder="Example: Sarah M.">
@@ -109,22 +113,24 @@ function renderTestimonials() {
           </select>
         </label>
         <label>The customer's review (required)
-          <textarea data-testimonial-field="review" rows="4" maxlength="1000" required placeholder="Paste the customer's own words here.">${escapeHtml(note.review)}</textarea>
+          <textarea data-testimonial-field="review" rows="4" maxlength="1400" required placeholder="Paste the customer's own words here.">${escapeHtml(note.review)}</textarea>
         </label>
       </div>
       <button class="button button-secondary" data-remove-testimonial type="button">Remove This Review</button>
+      </details>
     </article>
   `).join('');
 }
 
 function renderTips() {
   if (!state.social.tips.length) {
-    tipList.innerHTML = '<p class="admin-empty">Click Add a Tip to share advice. The tips already on the website stay in place.</p>';
+    tipList.innerHTML = '<p class="admin-empty">There are no tips in this list. Click Add a Tip to share advice.</p>';
     return;
   }
 
   tipList.innerHTML = state.social.tips.map((tip, index) => `
-    <article class="admin-item admin-item-compact" data-index="${index}">
+    <article class="admin-item admin-item-compact admin-library-item" data-index="${index}">
+      <details ${!tip.petType ? 'open' : ''}><summary><strong>${escapeHtml(tip.petType || 'New pet tip')}</strong><span>Edit tip</span></summary>
       <div>
         <label>What kind of pet is this for? (required)
           <input data-tip-field="petType" value="${escapeHtml(tip.petType)}" maxlength="60" required placeholder="Example: Cats">
@@ -134,6 +140,7 @@ function renderTips() {
         </label>
       </div>
       <button class="button button-secondary" data-remove-tip type="button">Remove This Tip</button>
+      </details>
     </article>
   `).join('');
 }
@@ -247,7 +254,7 @@ document.querySelector('#logout-button').addEventListener('click', async () => {
 });
 
 document.querySelector('#add-photo-button').addEventListener('click', () => {
-  if (state.gallery.photos.length >= 18) return setStatus(editorStatus, 'You can add up to 18 photos here. Remove one before adding another.', 'error');
+  if (state.gallery.photos.length >= 60) return setStatus(editorStatus, 'You can keep up to 60 photos here. Remove one before adding another.', 'error');
   state.gallery.photos.push({ id: uid('photo'), title: '', caption: '', image: '' });
   renderPhotos();
   updateDraft();
@@ -255,7 +262,7 @@ document.querySelector('#add-photo-button').addEventListener('click', () => {
 });
 
 document.querySelector('#add-testimonial-button').addEventListener('click', () => {
-  if (state.gallery.testimonials.length >= 12) return setStatus(editorStatus, 'You can add up to 12 reviews here. Remove one before adding another.', 'error');
+  if (state.gallery.testimonials.length >= 60) return setStatus(editorStatus, 'You can keep up to 60 reviews here. Remove one before adding another.', 'error');
   state.gallery.testimonials.push({ id: uid('note'), rating: 5, displayName: '', review: '' });
   renderTestimonials();
   updateDraft();
@@ -263,7 +270,7 @@ document.querySelector('#add-testimonial-button').addEventListener('click', () =
 });
 
 document.querySelector('#add-tip-button').addEventListener('click', () => {
-  if (state.social.tips.length >= 12) return setStatus(editorStatus, 'You can add up to 12 tips here. Remove one before adding another.', 'error');
+  if (state.social.tips.length >= 30) return setStatus(editorStatus, 'You can keep up to 30 tips here. Remove one before adding another.', 'error');
   state.social.tips.push({ petType: '', tip: '' });
   renderTips();
   updateDraft();
@@ -318,6 +325,8 @@ testimonialList.addEventListener('input', (event) => {
 testimonialList.addEventListener('click', (event) => {
   if (!event.target.matches('[data-remove-testimonial]')) return;
   const index = Number(event.target.closest('.admin-item')?.dataset.index);
+  const sourceId = state.gallery.testimonials[index].sourceReviewId;
+  if (sourceId) state.gallery.hiddenReviewIds = [...new Set([...(state.gallery.hiddenReviewIds || []), sourceId])];
   state.gallery.testimonials.splice(index, 1);
   renderTestimonials();
   updateDraft();
@@ -372,8 +381,8 @@ contentForm.addEventListener('submit', async (event) => {
   const groups = [
     ['announcement', 'Top message', state.announcement.enabled ? state.announcement.text : 'Message will be hidden.'],
     ['home', 'Home page words', `${state.home.tagline || 'Original welcome sentence'}; ${state.home.intro || 'Original introduction'}`],
-    ['gallery', 'Gallery additions', `${state.gallery.photos.length} photos and ${state.gallery.testimonials.length} reviews will be kept in this editor. Original gallery photos and email-approved reviews stay in place.`],
-    ['social', 'Pet of the Week and tips', `${state.social.petOfWeekTitle || 'Original pet title'}; ${state.social.tips.length} added tips.`],
+    ['gallery', 'Gallery photos and reviews', `${state.gallery.photos.length} photos and ${state.gallery.testimonials.length} reviews will remain on the website. Removed items will no longer be shown.`],
+    ['social', 'Pet of the Week and tips', `${state.social.petOfWeekTitle || 'Original pet title'}; ${state.social.tips.length} tips will remain on the website.`],
   ];
   const summary = document.querySelector('#publish-summary');
   summary.replaceChildren();
@@ -449,6 +458,10 @@ contentForm.addEventListener('input', (event) => {
   updateDraft();
 });
 contentForm.addEventListener('change', updateDraft);
+contentForm.addEventListener('invalid', (event) => {
+  const details = event.target.closest('details');
+  if (details) details.open = true;
+}, true);
 discardButton.addEventListener('click', () => {
   if (!window.confirm('Discard all changes made since your last save? Your live website will stay as it is.')) return;
   state = structuredClone(savedState);

@@ -76,6 +76,7 @@ const petTips = [
 ];
 
 let backendTips = [];
+let manageExistingTips = false;
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (character) => ({
@@ -146,7 +147,7 @@ function tipTemplate([petType, tip]) {
 }
 
 function allTips() {
-  return [...petTips, ...backendTips.map((tip) => [tip.petType, tip.tip])];
+  return [...(manageExistingTips ? [] : petTips), ...backendTips.map((tip) => [tip.petType, tip.tip])];
 }
 
 function renderTips() {
@@ -233,6 +234,7 @@ function hydrateDynamicMotion() {
 hydrateLiveFeed();
 
 function applyBackendSocialContent(content) {
+  manageExistingTips = content.contentVersion === 2;
   backendTips = Array.isArray(content.social?.tips) ? content.social.tips.filter((tip) => tip.petType && tip.tip) : [];
   renderTips();
   hydrateDynamicMotion();

@@ -1,3 +1,4 @@
+import { hydrateExistingContent } from '../../site-content-defaults.js';
 const CONTENT_KEY = 'site-content-v1';
 
 function defaultContent() {
@@ -59,9 +60,9 @@ function json(status, body) {
 }
 
 async function readContent(env) {
-  if (!env.SITE_CONTENT_KV) return defaultContent();
+  if (!env.SITE_CONTENT_KV) return hydrateExistingContent(defaultContent());
   const saved = await env.SITE_CONTENT_KV.get(CONTENT_KEY, { type: 'json' });
-  return mergeContent(saved || {});
+  return hydrateExistingContent(mergeContent(saved || {}));
 }
 
 export async function onRequest({ request, env }) {

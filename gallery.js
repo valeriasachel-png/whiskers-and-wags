@@ -24,6 +24,7 @@ let returnFocus;
 let touchStartX = 0;
 let approvedReviewCache = [];
 let backendNotes = [];
+let hiddenReviewIds = [];
 
 function photoData(index) {
   const button = thumbnailButtons[index];
@@ -38,7 +39,8 @@ function wrapIndex(index) {
   return (index + thumbnailButtons.length) % thumbnailButtons.length;
 }
 
-function setFeaturedPhoto(index) {
+function setFeaturedPhoto(index, scroll = true) {
+  if (!thumbnailButtons.length) return;
   activePhoto = wrapIndex(index);
   const selected = photoData(activePhoto);
   featureImage.src = selected.src;
@@ -52,7 +54,7 @@ function setFeaturedPhoto(index) {
     button.classList.toggle('selected', chosen);
     button.setAttribute('aria-pressed', String(chosen));
   });
-  thumbnailButtons[activePhoto].scrollIntoView({
+  if (scroll) thumbnailButtons[activePhoto].scrollIntoView({
     behavior: reduceMotion ? 'auto' : 'smooth',
     block: 'nearest',
     inline: 'center',
@@ -69,6 +71,7 @@ function setViewerPhoto(index) {
 }
 
 function openViewer() {
+  if (!thumbnailButtons.length) return;
   returnFocus = document.activeElement;
   setViewerPhoto(activePhoto);
   viewer.hidden = false;
@@ -173,7 +176,8 @@ function renderApprovedReviews(reviews) {
 }
 
 function renderAllReviews() {
-  renderApprovedReviews([...backendNotes, ...approvedReviewCache]);
+  const managedIds = new Set(backendNotes.map((note) => note.sourceReviewId).filter(Boolean));
+  renderApprovedReviews([...backendNotes, ...approvedReviewCache.filter((note) => !managedIds.has(note.id) && !hiddenReviewIds.includes(note.id))]);
 }
 
 async function loadApprovedReviews() {
@@ -190,8 +194,13 @@ async function loadApprovedReviews() {
   }
 }
 
-function appendBackendPhotos(photos = []) {
-  if (!filmstrip || !Array.isArray(photos) || !photos.length) return;
+function appendBackendPhotos(photos = [], replaceExisting = false) {
+  if (!filmstrip || !Array.isArray(photos)) return;
+  if (replaceExisting) {
+    filmstrip.replaceChildren();
+    thumbnailButtons = [];
+    activePhoto = 0;
+  }
   const existingIds = new Set(thumbnailButtons.map((button) => button.dataset.backendId).filter(Boolean));
   photos.forEach((photo) => {
     if (!photo.image || !photo.title || existingIds.has(photo.id)) return;
@@ -204,20 +213,27 @@ function appendBackendPhotos(photos = []) {
     button.dataset.viewCaption = photo.caption || 'A sweet Whiskers & Wags care moment.';
     button.setAttribute('aria-label', `Show ${photo.title}`);
     button.setAttribute('aria-pressed', 'false');
-    button.innerHTML = `<img src="${photo.image}" alt="" loading="lazy">`;
+    button.innerHTML = `<img src="${escapeHtml(photo.image)}" alt="" loading="lazy">`;
     filmstrip.append(button);
     bindThumbnail(button);
   });
   thumbnailButtons = [...document.querySelectorAll('.gallery-thumb')];
-  setFeaturedPhoto(activePhoto);
+  document.querySelector('.gallery-collection').hidden = !thumbnailButtons.length;
+  if (!thumbnailButtons.length) {
+    closeViewer();
+    return;
+  }
+  setFeaturedPhoto(activePhoto, false);
 }
 
 function applyBackendContent(content) {
-  appendBackendPhotos(content.gallery?.photos || []);
+  appendBackendPhotos(content.gallery?.photos || [], content.contentVersion === 2);
+  hiddenReviewIds = content.gallery?.hiddenReviewIds || [];
   backendNotes = (content.gallery?.testimonials || []).map((note) => ({
     rating: note.rating || 5,
     review: note.review,
     displayName: note.displayName,
+    sourceReviewId: note.sourceReviewId,
   })).filter((note) => note.review && note.displayName);
   renderAllReviews();
 }

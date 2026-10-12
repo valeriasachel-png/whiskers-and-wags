@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createHmac, randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { hydrateExistingContent, includeApprovedReviews } from './site-content-defaults.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const envFile = path.join(root, '.env');
@@ -31,7 +32,7 @@ const requestWindows = new Map();
 const localPendingReviews = new Map();
 let localApprovedReviews = [];
 let localSocialFeedCache = null;
-let localSiteContent = defaultSiteContent();
+let localSiteContent = hydrateExistingContent(defaultSiteContent());
 const REQUEST_LIMIT = 5;
 const REQUEST_WINDOW_MS = 15 * 60 * 1000;
 const contentTypes = {
@@ -221,7 +222,7 @@ function cleanImage(value) {
 
 function sanitizeSiteContent(input = {}) {
   const photos = Array.isArray(input.gallery?.photos)
-    ? input.gallery.photos.slice(0, 18).map((photo) => ({
+    ? input.gallery.photos.slice(0, 60).map((photo) => ({
         id: cleanText(photo.id, 80) || makeId(),
         title: cleanText(photo.title, 90),
         caption: cleanText(photo.caption, 240),
@@ -229,18 +230,19 @@ function sanitizeSiteContent(input = {}) {
       })).filter((photo) => photo.title && photo.image)
     : [];
   const testimonials = Array.isArray(input.gallery?.testimonials)
-    ? input.gallery.testimonials.slice(0, 12).map((testimonial) => {
+    ? input.gallery.testimonials.slice(0, 60).map((testimonial) => {
         const rating = Number(testimonial.rating);
         return {
           id: cleanText(testimonial.id, 80) || makeId(),
+          sourceReviewId: cleanText(testimonial.sourceReviewId, 80),
           rating: Number.isInteger(rating) && rating >= 1 && rating <= 5 ? rating : 5,
           displayName: cleanText(testimonial.displayName, 80),
-          review: cleanText(testimonial.review, 1000),
+          review: cleanText(testimonial.review, 1400),
         };
       }).filter((testimonial) => testimonial.displayName && testimonial.review)
     : [];
   const tips = Array.isArray(input.social?.tips)
-    ? input.social.tips.slice(0, 12).map((tip) => ({
+    ? input.social.tips.slice(0, 30).map((tip) => ({
         petType: cleanText(tip.petType, 60),
         tip: cleanText(tip.tip, 260),
       })).filter((tip) => tip.petType && tip.tip)
@@ -256,7 +258,8 @@ function sanitizeSiteContent(input = {}) {
       tagline: cleanText(input.home?.tagline, 90),
       intro: cleanText(input.home?.intro, 420),
     },
-    gallery: { photos, testimonials },
+    contentVersion: input.contentVersion === 2 ? 2 : 1,
+    gallery: { photos, testimonials, hiddenReviewIds: Array.isArray(input.gallery?.hiddenReviewIds) ? input.gallery.hiddenReviewIds.slice(0, 300).map((id) => cleanText(id, 80)) : [] },
     social: {
       petOfWeekTitle: cleanText(input.social?.petOfWeekTitle, 90),
       petOfWeekDescription: cleanText(input.social?.petOfWeekDescription, 340),
@@ -1264,7 +1267,7 @@ async function submitEvent(request, response) {
 }
 
 function getPublicContent(response) {
-  return json(response, 200, { content: localSiteContent });
+  return json(response, 200, { content: hydrateExistingContent(localSiteContent) });
 }
 
 async function handleAdmin(request, response, url) {
@@ -1309,7 +1312,7 @@ async function handleAdmin(request, response, url) {
   }
 
   if (request.method === 'GET' && action === 'content') {
-    return json(response, 200, { content: localSiteContent });
+    return json(response, 200, { content: includeApprovedReviews(hydrateExistingContent(localSiteContent), localApprovedReviews) });
   }
 
   if (request.method === 'PUT' && action === 'content') {

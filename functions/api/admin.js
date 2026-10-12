@@ -1,3 +1,4 @@
+import { hydrateExistingContent, includeApprovedReviews } from '../../site-content-defaults.js';
 const CONTENT_KEY = 'site-content-v1';
 const SESSION_COOKIE = 'ww_admin';
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
@@ -77,7 +78,7 @@ function cleanRating(value) {
 
 function sanitizeContent(input = {}) {
   const photos = Array.isArray(input.gallery?.photos)
-    ? input.gallery.photos.slice(0, 18).map((photo) => ({
+    ? input.gallery.photos.slice(0, 60).map((photo) => ({
         id: cleanText(photo.id, 80) || crypto.randomUUID(),
         title: cleanText(photo.title, 90),
         caption: cleanText(photo.caption, 240),
@@ -86,22 +87,24 @@ function sanitizeContent(input = {}) {
     : [];
 
   const testimonials = Array.isArray(input.gallery?.testimonials)
-    ? input.gallery.testimonials.slice(0, 12).map((testimonial) => ({
+    ? input.gallery.testimonials.slice(0, 60).map((testimonial) => ({
         id: cleanText(testimonial.id, 80) || crypto.randomUUID(),
+        sourceReviewId: cleanText(testimonial.sourceReviewId, 80),
         rating: cleanRating(testimonial.rating),
         displayName: cleanText(testimonial.displayName, 80),
-        review: cleanLongText(testimonial.review, 1000),
+        review: cleanLongText(testimonial.review, 1400),
       })).filter((testimonial) => testimonial.displayName && testimonial.review)
     : [];
 
   const tips = Array.isArray(input.social?.tips)
-    ? input.social.tips.slice(0, 12).map((tip) => ({
+    ? input.social.tips.slice(0, 30).map((tip) => ({
         petType: cleanText(tip.petType, 60),
         tip: cleanLongText(tip.tip, 260),
       })).filter((tip) => tip.petType && tip.tip)
     : [];
 
   return {
+    contentVersion: input.contentVersion === 2 ? 2 : 1,
     announcement: {
       enabled: Boolean(input.announcement?.enabled),
       text: cleanText(input.announcement?.text, 180),
@@ -112,7 +115,7 @@ function sanitizeContent(input = {}) {
       tagline: cleanText(input.home?.tagline, 90),
       intro: cleanLongText(input.home?.intro, 420),
     },
-    gallery: { photos, testimonials },
+    gallery: { photos, testimonials, hiddenReviewIds: Array.isArray(input.gallery?.hiddenReviewIds) ? input.gallery.hiddenReviewIds.slice(0, 300).map((id) => cleanText(id, 80)) : [] },
     social: {
       petOfWeekTitle: cleanText(input.social?.petOfWeekTitle, 90),
       petOfWeekDescription: cleanLongText(input.social?.petOfWeekDescription, 340),
@@ -195,7 +198,8 @@ function setupReady(env) {
 
 async function readContent(env) {
   const saved = await env.SITE_CONTENT_KV.get(CONTENT_KEY, { type: 'json' });
-  return mergeContent(saved || {});
+  const approved = env.REVIEWS_KV ? await env.REVIEWS_KV.get('approved-reviews', { type: 'json' }) : [];
+  return includeApprovedReviews(hydrateExistingContent(mergeContent(saved || {})), Array.isArray(approved) ? approved : []);
 }
 
 async function writeContent(env, content) {

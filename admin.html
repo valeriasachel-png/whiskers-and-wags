@@ -6,8 +6,8 @@
     <meta name="robots" content="noindex,nofollow">
     <title>Admin Dashboard | Whiskers &amp; Wags</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/styles.css?v=20261011-3">
-    <script src="/admin.js?v=20261011-2" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20261011-4">
+    <script src="/admin.js?v=20261011-4" defer></script>
   </head>
   <body class="admin-page">
     <main class="admin-shell">
@@ -40,7 +40,7 @@
 
         <aside class="admin-guide" aria-label="How to use your website editor">
           <ol><li><strong>Choose what to update</strong><span>Edit a message, add a photo, or share a pet tip below.</span></li><li><strong>Review your changes</strong><span>Check the list before anything goes onto the website.</span></li><li><strong>Publish when ready</strong><span>Then open the live website to see your update.</span></li></ol>
-          <p>You can leave sections alone. Existing photos and reviews stay on the website.</p>
+          <p>Your current photos, wording, approved reviews, and pet tips are filled in below. Open an item to edit it. Nothing changes on the website until you publish.</p>
         </aside>
         <nav class="admin-shortcuts" aria-label="Choose what to edit">
           <a href="#edit-message">Top message</a><a href="#edit-home">Home page words</a><a href="#edit-photos">Photos</a><a href="#edit-reviews">Customer reviews</a><a href="#edit-spotlight">Pet of the Week</a><a href="#edit-tips">Pet tips</a>
@@ -82,21 +82,21 @@
             <div class="admin-section-heading">
               <div>
                 <div class="eyebrow">Appears in Gallery &amp; Client Notes</div>
-                <h2>Add pet photos</h2>
-                <p>Click Add a Photo, choose a picture from your phone or computer, then give it a name. A short description is optional. Only use photos you have permission to share.</p>
-                <p class="admin-help">Use a JPG, PNG, WebP, or GIF smaller than 1.8 MB. If an iPhone photo ends in HEIC, export it as a JPEG first. The original gallery photos stay in place; this section manages photos added here.</p>
+                <h2>Your gallery photos</h2>
+                <p>Click a photo below to change its name, description, or picture. To add another, click Add a Photo. Only use pictures you have permission to share.</p>
+                <p class="admin-help">Use a JPG, PNG, WebP, or GIF smaller than 1.8 MB. If an iPhone photo ends in HEIC, export it as a JPEG first. Removing a photo takes it off the website only after you publish. Discard Unsaved Changes brings it back before publishing.</p>
               </div>
               <button class="button button-secondary" id="add-photo-button" type="button">Add a Photo</button>
             </div>
-            <div class="admin-list" id="photo-list"></div>
+            <div class="admin-list admin-photo-library" id="photo-list"></div>
           </section>
 
           <section class="admin-panel admin-wide" id="edit-reviews">
             <div class="admin-section-heading">
               <div>
                 <div class="eyebrow">Appears beside customer reviews in the gallery</div>
-                <h2>Share a customer review</h2>
-                <p>Add a review a customer has given you permission to share. Enter their public name, their rating, and their own words. Reviews approved through your emails are managed separately.</p>
+                <h2>Your customer reviews</h2>
+                <p>Your already-approved reviews appear below too. Open one to correct its public name or text, or remove it from the website. Keep the customer's meaning and rating accurate. New submissions still need your email approval.</p>
               </div>
               <button class="button button-secondary" id="add-testimonial-button" type="button">Add a Review</button>
             </div>
@@ -123,8 +123,8 @@
             <div class="admin-section-heading">
               <div>
                 <div class="eyebrow">Appears on Social &amp; Events</div>
-                <h2>Share a pet care tip</h2>
-                <p>Choose a kind of pet and add one short, useful tip. Your new tips appear alongside the existing ones.</p>
+                <h2>Your pet care tips</h2>
+                <p>Open an existing tip to change its wording or remove it. Click Add a Tip to share another.</p>
               </div>
               <button class="button button-secondary" id="add-tip-button" type="button">Add a Tip</button>
             </div>
