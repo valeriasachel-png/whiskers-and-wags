@@ -6,8 +6,8 @@
     <meta name="robots" content="noindex,nofollow">
     <title>Admin Dashboard | Whiskers &amp; Wags</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/styles.css?v=20261011-4">
-    <script src="/admin.js?v=20261011-4" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20261011-5">
+    <script src="/admin.js?v=20261011-5" defer></script>
   </head>
   <body class="admin-page">
     <main class="admin-shell">
@@ -30,7 +30,7 @@
           <div>
             <div class="eyebrow">Your website editor</div>
             <h1>A little update, made easy.</h1>
-            <p>Choose a section below. Your changes stay here until you review and publish them.</p>
+            <p>Choose a section below. Preview your changes, then save when you are ready for visitors to see them.</p>
           </div>
           <div class="admin-actions">
             <a class="button button-secondary" href="/" target="_blank" rel="noopener">See Live Website</a>
@@ -39,8 +39,8 @@
         </header>
 
         <aside class="admin-guide" aria-label="How to use your website editor">
-          <ol><li><strong>Choose what to update</strong><span>Edit a message, add a photo, or share a pet tip below.</span></li><li><strong>Review your changes</strong><span>Check the list before anything goes onto the website.</span></li><li><strong>Publish when ready</strong><span>Then open the live website to see your update.</span></li></ol>
-          <p>Your current photos, wording, approved reviews, and pet tips are filled in below. Open an item to edit it. Nothing changes on the website until you publish.</p>
+          <ol><li><strong>Choose what to update</strong><span>Open an existing photo to change its picture, name, or caption.</span></li><li><strong>See your preview</strong><span>Your photo and words update in the preview as you edit.</span></li><li><strong>Save when ready</strong><span>Click Save Changes to put your updates on the website.</span></li></ol>
+          <p>Your current photos, wording, approved reviews, and pet tips are filled in below. Open an item to edit it. Nothing changes on the website until you click Save Changes.</p>
         </aside>
         <nav class="admin-shortcuts" aria-label="Choose what to edit">
           <a href="#edit-message">Top message</a><a href="#edit-home">Home page words</a><a href="#edit-photos">Photos</a><a href="#edit-reviews">Customer reviews</a><a href="#edit-spotlight">Pet of the Week</a><a href="#edit-tips">Pet tips</a>
@@ -83,8 +83,8 @@
               <div>
                 <div class="eyebrow">Appears in Gallery &amp; Client Notes</div>
                 <h2>Your gallery photos</h2>
-                <p>Click a photo below to change its name, description, or picture. To add another, click Add a Photo. Only use pictures you have permission to share.</p>
-                <p class="admin-help">Use a JPG, PNG, WebP, or GIF smaller than 1.8 MB. If an iPhone photo ends in HEIC, export it as a JPEG first. Removing a photo takes it off the website only after you publish. Discard Unsaved Changes brings it back before publishing.</p>
+                <p>Click a photo below to change its name, caption, or picture. A preview shows your changes before you save. To add another, click Add a Photo. Only use pictures you have permission to share.</p>
+                <p class="admin-help">Use a JPG, PNG, WebP, or GIF smaller than 1.8 MB. If an iPhone photo ends in HEIC, export it as a JPEG first. Removing a photo takes it off the website only after you save. Discard Unsaved Changes brings it back before saving.</p>
               </div>
               <button class="button button-secondary" id="add-photo-button" type="button">Add a Photo</button>
             </div>
@@ -132,17 +132,18 @@
           </section>
 
           <section class="admin-panel admin-save-panel">
-            <div><strong>Ready to update the website?</strong><p class="muted">Review first. Nothing goes live until you click Publish Changes.</p></div>
-            <div class="admin-actions"><button class="button button-secondary" id="discard-changes" type="button" disabled>Discard Unsaved Changes</button><button class="button" id="review-changes" type="submit" disabled>Review Changes</button></div>
+            <div><strong>Ready to update the website?</strong><p class="muted">Preview first. Nothing goes live until you click Save Changes.</p></div>
+            <div class="admin-actions"><button class="button button-secondary" id="discard-changes" type="button" disabled>Discard Unsaved Changes</button><button class="button" id="review-changes" type="submit" disabled>Preview &amp; Save Changes</button></div>
             <p class="form-status" id="save-status" role="status" aria-live="polite"></p>
           </section>
         </fieldset>
         </form>
         <dialog class="admin-review" id="publish-dialog" aria-labelledby="publish-title" aria-describedby="publish-help">
-          <h2 id="publish-title">Check your changes</h2>
-          <p id="publish-help">These updates will be visible to everyone who visits your website. Sections not listed here will stay as they are.</p>
+          <h2 id="publish-title">See it before you save</h2>
+          <p id="publish-help">Here is a preview of your changed photos, followed by all your unsaved updates. Save Changes puts all these updates on the website for visitors to see. Keep Editing takes you back without saving.</p>
+          <div id="publish-photo-previews" hidden></div>
           <ul id="publish-summary"></ul>
-          <div class="admin-actions"><button class="button button-secondary" id="keep-editing" type="button">Keep Editing</button><button class="button" id="publish-changes" type="button">Publish Changes</button></div>
+          <div class="admin-actions"><button class="button button-secondary" id="keep-editing" type="button">Keep Editing</button><button class="button" id="publish-changes" type="button">Save Changes</button></div>
         </dialog>
       </section>
     </main>

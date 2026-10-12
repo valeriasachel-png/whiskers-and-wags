@@ -27,6 +27,7 @@ function updateDraft() {
   dirty = JSON.stringify(state) !== JSON.stringify(savedState);
   reviewButton.disabled = !dirty || uploading > 0;
   discardButton.disabled = !dirty || uploading > 0;
+  photoList.querySelectorAll('[data-preview-photo]').forEach((button) => { button.disabled = !dirty || uploading > 0; });
   setStatus(editorStatus, uploading ? 'Reading your photo. Please wait...' : dirty
     ? 'You have unsaved changes. They are not on the website yet.'
     : 'Your saved content is ready. Choose a section to make an update.');
@@ -65,6 +66,25 @@ function textValue(selector) {
   return document.querySelector(selector).value.trim();
 }
 
+function photoPreview(photo) {
+  return `<figure class="admin-photo-preview" aria-label="Gallery preview">
+    <div class="gallery-feature">${photo.image ? `<img data-preview-image src="${escapeHtml(photo.image)}" alt="${escapeHtml(photo.title || 'Your photo')}">` : '<p class="admin-preview-empty">Choose a photo to see it here.</p>'}</div>
+    <figcaption class="gallery-stage-copy"><span class="gallery-label">The care journal</span>
+      <h3 data-preview-title>${escapeHtml(photo.title || 'Your photo title')}</h3>
+      <p data-preview-caption>${escapeHtml(photo.caption || 'A sweet Whiskers & Wags care moment.')}</p>
+    </figcaption>
+  </figure>`;
+}
+
+// Update text in place so typing never loses focus or moves the cursor.
+function updatePhotoPreview(item, photo) {
+  item.querySelector('[data-preview-title]').textContent = photo.title || 'Your photo title';
+  item.querySelector('[data-preview-caption]').textContent = photo.caption || 'A sweet Whiskers & Wags care moment.';
+  item.querySelector('summary strong').textContent = photo.title || 'Your new photo';
+  const image = item.querySelector('[data-preview-image]');
+  if (image) image.alt = photo.title || 'Your photo';
+}
+
 function renderPhotos() {
   const expanded = new Set([...photoList.querySelectorAll('details[open]')].map((item) => item.closest('.admin-item').dataset.photoId));
   if (!state.gallery.photos.length) {
@@ -76,18 +96,20 @@ function renderPhotos() {
     <article class="admin-item admin-library-item" data-index="${index}" data-photo-id="${escapeHtml(photo.id)}">
       <details ${!photo.title || expanded.has(photo.id) ? 'open' : ''}>
       <summary>${photo.image ? `<img src="${escapeHtml(photo.image)}" alt="" loading="lazy">` : '<div class="admin-image-placeholder">New photo</div>'}<strong>${escapeHtml(photo.title || 'Your new photo')}</strong><span>Edit photo and words</span></summary>
-      <div>
+      <div class="admin-photo-workspace"><div class="admin-photo-fields">
         <label>Pet name or photo title (required)
           <input data-photo-field="title" value="${escapeHtml(photo.title)}" maxlength="90" required placeholder="Example: Bella enjoying the sunshine" aria-describedby="photo-title-help-${index}">
         </label>
         <p class="admin-help" id="photo-title-help-${index}">This name appears with the photo in your gallery.</p>
-        <label>A short description (optional)
+        <label>Photo caption (optional)
           <textarea data-photo-field="caption" rows="3" maxlength="240" placeholder="Example: A relaxing afternoon after our walk.">${escapeHtml(photo.caption)}</textarea>
         </label>
         <label>${photo.image ? 'Choose a different photo' : 'Choose a photo (required)'}
           <input data-photo-field="image" type="file" ${photo.image ? '' : 'required'} accept="image/png,image/jpeg,image/webp,image/gif">
         </label>
       </div>
+      <div><p class="admin-preview-label">Live preview <span>Preview only</span></p>${photoPreview(photo)}<p class="admin-help">Your picture and words update here as you edit. The gallery adjusts to each visitor's screen.</p></div></div>
+      <button class="button" data-preview-photo type="submit" disabled>Preview &amp; Save Changes</button>
       <button class="button button-secondary" data-remove-photo type="button">Remove This Photo</button>
       </details>
     </article>
@@ -283,6 +305,7 @@ photoList.addEventListener('input', (event) => {
   const field = event.target.dataset.photoField;
   if (!Number.isInteger(index) || !field || field === 'image') return;
   state.gallery.photos[index][field] = event.target.value;
+  updatePhotoPreview(item, state.gallery.photos[index]);
 });
 
 photoList.addEventListener('change', async (event) => {
@@ -386,6 +409,10 @@ contentForm.addEventListener('submit', async (event) => {
   ];
   const summary = document.querySelector('#publish-summary');
   summary.replaceChildren();
+  const previews = document.querySelector('#publish-photo-previews');
+  const changedPhotos = state.gallery.photos.filter((photo) => !savedState.gallery.photos.some((old) => JSON.stringify(old) === JSON.stringify(photo)));
+  previews.innerHTML = changedPhotos.map(photoPreview).join('');
+  previews.hidden = !changedPhotos.length;
   for (const [key, label, detail] of groups) {
     if (JSON.stringify(state[key]) === JSON.stringify(savedState[key])) continue;
     const item = document.createElement('li');
@@ -442,7 +469,7 @@ document.querySelector('#publish-changes').addEventListener('click', async () =>
     state = result.content;
     savedState = structuredClone(state);
     renderState();
-    setStatus(saveStatus, 'Published. Your changes are on the website. Click See Live Website to view them; allow a minute for photos and text to refresh.', 'success');
+    setStatus(saveStatus, 'Saved. Your changes are on the website. Click See Live Website to view them; allow a minute for photos and text to refresh.', 'success');
   } catch (error) {
     setStatus(saveStatus, error.message, 'error');
   } finally {
